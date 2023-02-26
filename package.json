@@ -1,0 +1,35 @@
+{
+  "name": "seqdiag",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "npm run build:parser && run-p build:common build:esm",
+    "build:parser": "tspeg src/grammar.pegjs src/parser.ts",
+    "build:common": "tsc",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "test": "npm run build:parser && jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@jest/types": "^29.4.1",
+    "@types/jest": "^29.4.0",
+    "@types/node": "^18.11.18",
+    "jest": "^29.4.1",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^4.1.2",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "tspeg": "^3.2.1"
+  }
+}

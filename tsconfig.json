@@ -4,6 +4,7 @@
       "module": "CommonJS",
       "moduleResolution": "Node",
       "esModuleInterop": true,
+      "isolatedModules": true,
       "strict": true,
       "lib": ["ESNext"],
       "types": ["node", "jest"],

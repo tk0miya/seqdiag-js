@@ -10,10 +10,9 @@
   ],
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "npm run build:parser && run-p build:common build:esm",
+    "build": "npm run build:parser && run-p build:dist",
     "build:parser": "tspeg src/grammar.pegjs src/parser.ts",
-    "build:common": "tsc",
-    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:dist": "esbuild src/index.ts --bundle --minify --sourcemap --outfile=dist/seqdiag.min.js",
     "test": "npm run build:parser && jest"
   },
   "author": "",
@@ -22,6 +21,7 @@
     "@jest/types": "^29.4.1",
     "@types/jest": "^29.4.0",
     "@types/node": "^18.11.18",
+    "esbuild": "^0.17.11",
     "jest": "^29.4.1",
     "npm-run-all": "^4.1.5",
     "rimraf": "^4.1.2",

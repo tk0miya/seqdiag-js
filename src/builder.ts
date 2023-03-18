@@ -5,10 +5,10 @@ export class Diagram {
 	edges: Edge[];
 	nodes: Node[];
 
-	defaultNodeHeight = 40;
-	defaultNodeWidth = 120;
-	defaultSpanHeight = 20;
-	defaultSpanWidth = 60;
+	nodeHeight = 40;
+	nodeWidth = 120;
+	spanHeight = 20;
+	spanWidth = 60;
 
 	constructor() {
 		this.edges = [];

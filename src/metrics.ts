@@ -60,18 +60,18 @@ export class Metrics {
 		const nodes = this.diagram.nodes.length;
 		const edges = this.diagram.edges.length;
 
-		const height = this.diagram.defaultNodeHeight + (edges + 2) * this.diagram.defaultSpanHeight;
-		const width = nodes * this.diagram.defaultNodeWidth + (nodes + 1) * this.diagram.defaultSpanWidth;
+		const height = this.diagram.nodeHeight + (edges + 2) * this.diagram.spanHeight;
+		const width = nodes * this.diagram.nodeWidth + (nodes + 1) * this.diagram.spanWidth;
 
 		return new Size(width, height);
 	}
 
 	node(node: Node): Box {
 		const index = this.diagram.nodes.indexOf(node);
-		const x = index * this.diagram.defaultNodeWidth + (index + 1) * this.diagram.defaultSpanWidth;
-		const y = this.diagram.defaultSpanHeight;
+		const x = index * this.diagram.nodeWidth + (index + 1) * this.diagram.spanWidth;
+		const y = this.diagram.spanHeight;
 
-		return new Box(x, y, this.diagram.defaultNodeWidth, this.diagram.defaultNodeHeight);
+		return new Box(x, y, this.diagram.nodeWidth, this.diagram.nodeHeight);
 	}
 
 	edge(edge: Edge): Box {
@@ -82,7 +82,7 @@ export class Metrics {
 
 		const x1 = nodes[0].center().x;
 		const x2 = nodes[1].center().x;
-		const y = this.diagram.defaultNodeHeight + (index + 2) * this.diagram.defaultSpanHeight;
+		const y = this.diagram.nodeHeight + (index + 2) * this.diagram.spanHeight;
 
 		return new Box(x1, y, x2 - x1, 1);
 	}

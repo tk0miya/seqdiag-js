@@ -1,7 +1,38 @@
 import * as parser from "./parser";
 import { ASTKinds } from "./parser";
 
-export class Diagram {
+interface IConfigurable<T> {
+	integerFields: { [key: string]: keyof T };
+	setIntegerAttribute(name: string, value: string | number, propName: keyof T): void;
+}
+
+class Configurable {
+	integerFields: { [key: string]: string } = {};
+
+	setAttributes(statements: parser.attribute_stmt[]) {
+		statements.forEach((stmt) => {
+			this.setAttribute(stmt.name, stmt.value);
+		});
+	}
+
+	setAttribute<T>(this: IConfigurable<T>, name: string, value: string | number) {
+		if (name in this.integerFields) {
+			this.setIntegerAttribute(name, value, this.integerFields[name]);
+		} else {
+			console.log(`unknown attribute: ${name}`);
+		}
+	}
+
+	setIntegerAttribute<T>(this: T, name: string, value: string | number, propName: keyof T) {
+		if (typeof value === "string") {
+			console.log(`unknown ${name}: ${value}`);
+		} else {
+			this[propName] = value as never;
+		}
+	}
+}
+
+export class Diagram extends Configurable {
 	edges: Edge[];
 	nodes: Node[];
 
@@ -10,7 +41,15 @@ export class Diagram {
 	spanHeight = 20;
 	spanWidth = 60;
 
+	integerFields: { [key: string]: keyof Diagram } = {
+		node_height: "nodeHeight",
+		node_width: "nodeWidth",
+		span_height: "spanHeight",
+		span_width: "spanWidth",
+	};
+
 	constructor() {
+		super();
 		this.edges = [];
 		this.nodes = [];
 	}
@@ -47,6 +86,10 @@ class DiagramBuilder {
 
 	build(ast: parser.diagram): void {
 		this.diagram = new Diagram();
+		const attributes = ast.statements.filter(
+			(stmt) => stmt.kind === ASTKinds.attribute_stmt,
+		) as parser.attribute_stmt[];
+		this.diagram.setAttributes(attributes);
 
 		ast.statements.forEach((stmt) => {
 			switch (stmt.kind) {

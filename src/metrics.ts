@@ -4,7 +4,7 @@ export class Size {
 	height: number;
 	width: number;
 
-	constructor(height: number, width: number) {
+	constructor(width: number, height: number) {
 		this.height = height;
 		this.width = width;
 	}
@@ -23,8 +23,8 @@ export class Point {
 export class Box extends Size {
 	coordinate: Point;
 
-	constructor(x: number, y: number, height: number, width: number) {
-		super(height, width);
+	constructor(x: number, y: number, width: number, height: number) {
+		super(width, height);
 		this.coordinate = new Point(x, y);
 	}
 
@@ -63,7 +63,7 @@ export class Metrics {
 		const height = this.diagram.defaultNodeHeight + (edges + 2) * this.diagram.defaultSpanHeight;
 		const width = nodes * this.diagram.defaultNodeWidth + (nodes + 1) * this.diagram.defaultSpanWidth;
 
-		return new Size(height, width);
+		return new Size(width, height);
 	}
 
 	node(node: Node): Box {
@@ -71,7 +71,7 @@ export class Metrics {
 		const x = index * this.diagram.defaultNodeWidth + (index + 1) * this.diagram.defaultSpanWidth;
 		const y = this.diagram.defaultSpanHeight;
 
-		return new Box(x, y, this.diagram.defaultNodeHeight, this.diagram.defaultNodeWidth);
+		return new Box(x, y, this.diagram.defaultNodeWidth, this.diagram.defaultNodeHeight);
 	}
 
 	edge(edge: Edge): Box {
@@ -84,6 +84,6 @@ export class Metrics {
 		const x2 = nodes[1].center().x;
 		const y = this.diagram.defaultNodeHeight + (index + 2) * this.diagram.defaultSpanHeight;
 
-		return new Box(x1, y, 1, x2 - x1);
+		return new Box(x1, y, x2 - x1, 1);
 	}
 }

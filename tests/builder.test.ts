@@ -41,5 +41,20 @@ describe("buildDiagram()", () => {
 			expect(diagram.nodes[4]).toMatchObject({ id: "E", label: "E" });
 			expect(diagram.nodes[5]).toMatchObject({ id: "F", label: "F" });
 		});
+
+		it("can assign attributes to the diagram", () => {
+			const ast = parse(`seqdiag {
+								 node_height = 123;
+								 node_width = 456;
+								 span_height = 789;
+								 span_width = 123;
+							   }`);
+			const diagram = buildDiagram(ast);
+			assert(diagram !== undefined);
+			expect(diagram.nodeHeight).toBe(123);
+			expect(diagram.nodeWidth).toBe(456);
+			expect(diagram.spanHeight).toBe(789);
+			expect(diagram.spanWidth).toBe(123);
+		});
 	});
 });

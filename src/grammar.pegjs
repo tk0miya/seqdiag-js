@@ -88,7 +88,17 @@ option_list := '\[' SP* first=option_stmt followings={ SP* ',' SP* item=option_s
                         }
                }
 option_stmt := name=identifier rvalue={ SP* '=' SP* value=value }?
-               .value = value | undefined { return this.rvalue?.value }
+               .value = string | number | undefined {
+                        if (this.rvalue) {
+                                if (typeof this.rvalue.value === 'string') {
+                                        return this.rvalue.value;
+                                } else {
+                                        return this.rvalue.value.value
+                                }
+                        } else {
+                                return undefined;
+                        }
+               }
 
 SP := '[ \t\r\n]' | SingleLineComment | MultiLineComment
 String := literal='"""(.|\r\n)*?"""'

@@ -3,19 +3,19 @@ import { ASTKinds } from "./parser";
 
 interface IConfigurable<T> {
 	integerFields: { [key: string]: keyof T };
-	setIntegerAttribute(name: string, value: string | number, propName: keyof T): void;
+	setIntegerAttribute(name: string, value: string | number | undefined, propName: keyof T): void;
 }
 
 class Configurable {
 	integerFields: { [key: string]: string } = {};
 
-	setAttributes(statements: parser.attribute_stmt[]) {
+	setAttributes(statements: parser.attribute_stmt[] | parser.option_stmt[]) {
 		statements.forEach((stmt) => {
 			this.setAttribute(stmt.name, stmt.value);
 		});
 	}
 
-	setAttribute<T>(this: IConfigurable<T>, name: string, value: string | number) {
+	setAttribute<T>(this: IConfigurable<T>, name: string, value: string | number | undefined) {
 		if (name in this.integerFields) {
 			this.setIntegerAttribute(name, value, this.integerFields[name]);
 		} else {
@@ -23,11 +23,11 @@ class Configurable {
 		}
 	}
 
-	setIntegerAttribute<T>(this: T, name: string, value: string | number, propName: keyof T) {
-		if (typeof value === "string") {
-			console.log(`unknown ${name}: ${value}`);
-		} else {
+	setIntegerAttribute<T>(this: T, name: string, value: string | number | undefined, propName: keyof T) {
+		if (typeof value === "number") {
 			this[propName] = value as never;
+		} else {
+			console.log(`unknown ${name}: ${value}`);
 		}
 	}
 }
@@ -55,13 +55,25 @@ export class Diagram extends Configurable {
 	}
 }
 
-export class Node {
+export class Node extends Configurable {
 	id: string;
 	label: string;
 
-	constructor(node_id: string) {
+	height: number;
+	width: number;
+
+	integerFields: { [key: string]: keyof Node } = {
+		height: "height",
+		width: "width",
+	};
+
+	constructor(diagram: Diagram, node_id: string) {
+		super();
 		this.id = node_id;
 		this.label = node_id;
+
+		this.height = diagram.nodeHeight;
+		this.width = diagram.nodeWidth;
 	}
 }
 
@@ -70,7 +82,7 @@ export class Edge {
 	op: string;
 	to: Node;
 
-	constructor(from: Node, op: string, to: Node) {
+	constructor(diagram: Diagram, from: Node, op: string, to: Node) {
 		this.from = from;
 		this.op = op;
 		this.to = to;
@@ -104,7 +116,9 @@ class DiagramBuilder {
 	}
 
 	private build_node(stmt: parser.node_stmt): void {
-		this.diagram.nodes.push(new Node(stmt.name));
+		const node = new Node(this.diagram, stmt.name);
+		node.setAttributes(stmt.options);
+		this.diagram.nodes.push(node);
 	}
 
 	private find_or_build_node(name: string): Node {
@@ -112,7 +126,7 @@ class DiagramBuilder {
 		if (node) {
 			return node;
 		} else {
-			const new_node = new Node(name);
+			const new_node = new Node(this.diagram, name);
 			this.diagram.nodes.push(new_node);
 			return new_node;
 		}
@@ -129,9 +143,9 @@ class DiagramBuilder {
 
 		let edge;
 		if (op === "=>") {
-			edge = new Edge(from, "->", to);
+			edge = new Edge(this.diagram, from, "->", to);
 		} else {
-			edge = new Edge(from, op, to);
+			edge = new Edge(this.diagram, from, op, to);
 		}
 		this.diagram.edges.push(edge);
 
@@ -140,7 +154,7 @@ class DiagramBuilder {
 		}
 
 		if (op === "=>") {
-			edge = new Edge(from, "<-", to);
+			edge = new Edge(this.diagram, from, "<-", to);
 			this.diagram.edges.push(edge);
 		}
 	}

@@ -51,27 +51,49 @@ export class Box extends Size {
 
 export class Metrics {
 	diagram: Diagram;
+	heights: number[];
+	widths: number[];
 
 	constructor(diagram: Diagram) {
 		this.diagram = diagram;
+		this.widths = [];
+		this.heights = [];
+
+		this.calculate();
+	}
+
+	calculate() {
+		// widths
+		this.diagram.nodes.forEach((node) => {
+			this.widths.push(this.diagram.spanWidth);
+			this.widths.push(node.width);
+		});
+		this.widths.push(this.diagram.spanWidth);
+
+		// heights
+		this.heights.push(this.diagram.spanHeight);
+		const node_heights = this.diagram.nodes.map((node) => node.height);
+		this.heights.push(Math.max(...node_heights));
+		this.diagram.edges.forEach((edge) => {
+			this.heights.push(this.diagram.spanHeight);
+			this.heights.push(0);
+		});
+		this.heights.push(this.diagram.spanHeight);
 	}
 
 	size(): Size {
-		const nodes = this.diagram.nodes.length;
-		const edges = this.diagram.edges.length;
-
-		const height = this.diagram.nodeHeight + (edges + 2) * this.diagram.spanHeight;
-		const width = nodes * this.diagram.nodeWidth + (nodes + 1) * this.diagram.spanWidth;
+		const width = this.widths.reduce((a, b) => a + b);
+		const height = this.heights.reduce((a, b) => a + b);
 
 		return new Size(width, height);
 	}
 
 	node(node: Node): Box {
 		const index = this.diagram.nodes.indexOf(node);
-		const x = index * this.diagram.nodeWidth + (index + 1) * this.diagram.spanWidth;
-		const y = this.diagram.spanHeight;
+		const x = this.widths.slice(0, index * 2 + 1).reduce((a, b) => a + b, 0);
+		const y = this.heights[0] + (this.heights[1] - node.height) / 2;
 
-		return new Box(x, y, this.diagram.nodeWidth, this.diagram.nodeHeight);
+		return new Box(x, y, node.width, node.height);
 	}
 
 	edge(edge: Edge): Box {
@@ -82,7 +104,7 @@ export class Metrics {
 
 		const x1 = nodes[0].center().x;
 		const x2 = nodes[1].center().x;
-		const y = this.diagram.nodeHeight + (index + 2) * this.diagram.spanHeight;
+		const y = this.heights.slice(0, index * 2 + 3).reduce((a, b) => a + b, 0);
 
 		return new Box(x1, y, x2 - x1, 1);
 	}

@@ -71,7 +71,7 @@ export class Metrics {
 		const x = index * this.diagram.nodeWidth + (index + 1) * this.diagram.spanWidth;
 		const y = this.diagram.spanHeight;
 
-		return new Box(x, y, this.diagram.nodeWidth, this.diagram.nodeHeight);
+		return new Box(x, y, node.width, node.height);
 	}
 
 	edge(edge: Edge): Box {

@@ -116,9 +116,8 @@ class DiagramBuilder {
 	}
 
 	private build_node(stmt: parser.node_stmt): void {
-		const node = new Node(this.diagram, stmt.name);
+		const node = this.find_or_build_node(stmt.name);
 		node.setAttributes(stmt.options);
-		this.diagram.nodes.push(node);
 	}
 
 	private find_or_build_node(name: string): Node {

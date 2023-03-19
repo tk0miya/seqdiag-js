@@ -22,6 +22,16 @@ describe("buildDiagram()", () => {
 			expect(diagram.nodes[1]).toMatchObject({ id: "B", label: "B" });
 		});
 
+		it("can build a diagram having duplicated node definitions", () => {
+			const ast = parse("seqdiag { A; B; A; }");
+			const diagram = buildDiagram(ast);
+			assert(diagram !== undefined);
+			expect(diagram.edges.length).toBe(0);
+			expect(diagram.nodes.length).toBe(2);
+			expect(diagram.nodes[0]).toMatchObject({ id: "A", label: "A" });
+			expect(diagram.nodes[1]).toMatchObject({ id: "B", label: "B" });
+		});
+
 		it("can build a diagram having edge definitions", () => {
 			const ast = parse("seqdiag { A -> B -> C; D => E => F }");
 			const diagram = buildDiagram(ast);

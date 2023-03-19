@@ -15,6 +15,21 @@ describe("Metrics", () => {
 			expect(metrics.node(diagram.nodes[1])).toMatchObject({ coordinate: { x: 240, y: 20 }, height: 40, width: 120 });
 		});
 
+		it("returns a metrics of the custom node", () => {
+			const ast = parse(`seqdiag {
+							     A; // width = 120, height = 40
+							     B [width = 24, height = 96];
+								 C [width = 32, height = 48];
+							   }`);
+			const diagram = buildDiagram(ast);
+			assert(diagram !== undefined);
+
+			const metrics = new Metrics(diagram);
+			expect(metrics.node(diagram.nodes[0])).toMatchObject({ coordinate: { x: 60, y: 48 }, height: 40, width: 120 });
+			expect(metrics.node(diagram.nodes[1])).toMatchObject({ coordinate: { x: 240, y: 20 }, height: 96, width: 24 });
+			expect(metrics.node(diagram.nodes[2])).toMatchObject({ coordinate: { x: 324, y: 44 }, height: 48, width: 32 });
+		});
+
 		it("returns a metrics of the given node for custom diagram", () => {
 			const ast = parse(`seqdiag {
 							     node_width = 20

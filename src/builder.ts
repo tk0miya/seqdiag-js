@@ -3,19 +3,19 @@ import { ASTKinds } from "./parser";
 
 interface IConfigurable<T> {
 	integerFields: { [key: string]: keyof T };
-	setIntegerAttribute(name: string, value: string | number, propName: keyof T): void;
+	setIntegerAttribute(name: string, value: string | number | undefined, propName: keyof T): void;
 }
 
 class Configurable {
 	integerFields: { [key: string]: string } = {};
 
-	setAttributes(statements: parser.attribute_stmt[]) {
+	setAttributes(statements: parser.attribute_stmt[] | parser.option_stmt[]) {
 		statements.forEach((stmt) => {
 			this.setAttribute(stmt.name, stmt.value);
 		});
 	}
 
-	setAttribute<T>(this: IConfigurable<T>, name: string, value: string | number) {
+	setAttribute<T>(this: IConfigurable<T>, name: string, value: string | number | undefined) {
 		if (name in this.integerFields) {
 			this.setIntegerAttribute(name, value, this.integerFields[name]);
 		} else {
@@ -23,11 +23,11 @@ class Configurable {
 		}
 	}
 
-	setIntegerAttribute<T>(this: T, name: string, value: string | number, propName: keyof T) {
-		if (typeof value === "string") {
-			console.log(`unknown ${name}: ${value}`);
-		} else {
+	setIntegerAttribute<T>(this: T, name: string, value: string | number | undefined, propName: keyof T) {
+		if (typeof value === "number") {
 			this[propName] = value as never;
+		} else {
+			console.log(`unknown ${name}: ${value}`);
 		}
 	}
 }
@@ -55,14 +55,20 @@ export class Diagram extends Configurable {
 	}
 }
 
-export class Node {
+export class Node extends Configurable {
 	id: string;
 	label: string;
 
 	height: number;
 	width: number;
 
+	integerFields: { [key: string]: keyof Node } = {
+		height: "height",
+		width: "width",
+	};
+
 	constructor(diagram: Diagram, node_id: string) {
+		super();
 		this.id = node_id;
 		this.label = node_id;
 
@@ -110,7 +116,9 @@ class DiagramBuilder {
 	}
 
 	private build_node(stmt: parser.node_stmt): void {
-		this.diagram.nodes.push(new Node(this.diagram, stmt.name));
+		const node = new Node(this.diagram, stmt.name);
+		node.setAttributes(stmt.options);
+		this.diagram.nodes.push(node);
 	}
 
 	private find_or_build_node(name: string): Node {

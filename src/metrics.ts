@@ -91,7 +91,7 @@ export class Metrics {
 	node(node: Node): Box {
 		const index = this.diagram.nodes.indexOf(node);
 		const x = this.widths.slice(0, index * 2 + 1).reduce((a, b) => a + b, 0);
-		const y = this.heights[0];
+		const y = this.heights[0] + (this.heights[1] - node.height) / 2;
 
 		return new Box(x, y, node.width, node.height);
 	}

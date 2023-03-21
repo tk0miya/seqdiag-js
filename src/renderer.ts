@@ -71,6 +71,13 @@ export class DiagramRenderer {
 		} else {
 			arrow.marker("start", marker);
 		}
+
+		if (edge.failed) {
+			const x = box.right() + 16;
+			const y = box.bottom();
+			this.drawer.line(x - 8, y - 8, x + 8, y + 8).stroke("black");
+			this.drawer.line(x - 8, y + 8, x + 8, y - 8).stroke("black");
+		}
 	}
 
 	private render_lifeline(node: Node) {

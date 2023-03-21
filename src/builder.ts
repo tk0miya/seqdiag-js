@@ -98,10 +98,12 @@ export class Edge extends Configurable {
 	asynchronous: boolean;
 	diagonal = false;
 	direction: "forward" | "back";
+	failed = false;
 	style: "solid" | "dashed";
 
 	booleanFields: { [key: string]: keyof Edge } = {
 		diagonal: "diagonal",
+		failed: "failed",
 	};
 
 	constructor(diagram: Diagram, from: Node, op: string, to: Node) {

@@ -6,7 +6,7 @@
       "esModuleInterop": true,
       "isolatedModules": true,
       "strict": true,
-      "lib": ["ESNext"],
+      "lib": ["ESNext", "DOM"],
       "types": ["node", "jest"],
       "outDir": "dist"
     },

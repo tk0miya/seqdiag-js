@@ -79,6 +79,7 @@ export class Metrics {
 			this.heights.push(0);
 		});
 		this.heights.push(this.diagram.spanHeight);
+		this.heights.push(this.diagram.spanHeight);
 	}
 
 	size(): Size {
@@ -86,6 +87,13 @@ export class Metrics {
 		const height = this.heights.reduce((a, b) => a + b);
 
 		return new Size(width, height);
+	}
+
+	lifeline(node: Node): Box {
+		const box = this.node(node);
+		const height = this.heights.reduce((a, b) => a + b, 0) - this.heights.slice(-1)[0];
+
+		return new Box(box.center().x, box.bottom(), 0, height);
 	}
 
 	node(node: Node): Box {

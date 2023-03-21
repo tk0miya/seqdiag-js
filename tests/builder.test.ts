@@ -37,12 +37,12 @@ describe("buildDiagram()", () => {
 			const diagram = buildDiagram(ast);
 			assert(diagram !== undefined);
 			expect(diagram.edges.length).toBe(6);
-			expect(diagram.edges[0]).toMatchObject({ from: { id: "A" }, op: "->", to: { id: "B" } });
-			expect(diagram.edges[1]).toMatchObject({ from: { id: "B" }, op: "->", to: { id: "C" } });
-			expect(diagram.edges[2]).toMatchObject({ from: { id: "D" }, op: "->", to: { id: "E" } });
-			expect(diagram.edges[3]).toMatchObject({ from: { id: "E" }, op: "->", to: { id: "F" } });
-			expect(diagram.edges[4]).toMatchObject({ from: { id: "E" }, op: "<-", to: { id: "F" } });
-			expect(diagram.edges[5]).toMatchObject({ from: { id: "D" }, op: "<-", to: { id: "E" } });
+			expect(diagram.edges[0]).toMatchObject({ from: { id: "A" }, op: "->", to: { id: "B" }, direction: "forward" });
+			expect(diagram.edges[1]).toMatchObject({ from: { id: "B" }, op: "->", to: { id: "C" }, direction: "forward" });
+			expect(diagram.edges[2]).toMatchObject({ from: { id: "D" }, op: "->", to: { id: "E" }, direction: "forward" });
+			expect(diagram.edges[3]).toMatchObject({ from: { id: "E" }, op: "->", to: { id: "F" }, direction: "forward" });
+			expect(diagram.edges[4]).toMatchObject({ from: { id: "E" }, op: "<-", to: { id: "F" }, direction: "back" });
+			expect(diagram.edges[5]).toMatchObject({ from: { id: "D" }, op: "<-", to: { id: "E" }, direction: "back" });
 			expect(diagram.nodes.length).toBe(6);
 			expect(diagram.nodes[0]).toMatchObject({ id: "A", label: "A" });
 			expect(diagram.nodes[1]).toMatchObject({ id: "B", label: "B" });

@@ -78,6 +78,7 @@ export class Node extends Configurable {
 }
 
 export class Edge {
+	direction: "forward" | "back";
 	from: Node;
 	op: string;
 	to: Node;
@@ -86,6 +87,12 @@ export class Edge {
 		this.from = from;
 		this.op = op;
 		this.to = to;
+
+		if (op.endsWith(">")) {
+			this.direction = "forward";
+		} else {
+			this.direction = "back";
+		}
 	}
 }
 

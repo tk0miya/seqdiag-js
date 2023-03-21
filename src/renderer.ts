@@ -1,4 +1,4 @@
-import { Diagram, Node } from "./builder";
+import { Diagram, Edge, Node } from "./builder";
 import { Metrics } from "./metrics";
 import { Marker, SVG, Svg } from "@svgdotjs/svg.js";
 
@@ -8,12 +8,14 @@ function generateElementId() {
 }
 
 export class DiagramRenderer {
+	arrowheads: { [key: string]: Marker };
 	diagram: Diagram;
 	drawer: Svg;
 	element: Element;
 	metrics: Metrics;
 
 	constructor(diagram: Diagram, element: Element) {
+		this.arrowheads = {};
 		this.diagram = diagram;
 		this.element = element;
 		this.drawer = SVG();
@@ -21,6 +23,8 @@ export class DiagramRenderer {
 	}
 
 	render() {
+		this.initialize_arrowheads();
+
 		const size = this.metrics.size();
 		this.drawer.size(size.width, size.height);
 
@@ -29,8 +33,34 @@ export class DiagramRenderer {
 			this.render_lifeline(node);
 		});
 
+		this.diagram.edges.forEach((edge) => {
+			this.render_edge(edge);
+		});
+
 		this.element.id ||= generateElementId();
 		this.drawer.addTo(`#${this.element.id}`);
+	}
+
+	private initialize_arrowheads() {
+		this.arrowheads["forward"] = this.drawer
+			.marker(10, 10, function (marker) {
+				marker.line(0, 0, 10, 5).stroke("black");
+				marker.line(0, 10, 10, 5).stroke("black");
+			})
+			.ref(10, 5)
+			.orient("auto-start-reverse");
+	}
+
+	private render_edge(edge: Edge) {
+		const box = this.metrics.edge(edge);
+		const arrow = this.drawer.line(box.left(), box.top(), box.right(), box.bottom()).stroke("black");
+
+		const marker = this.arrowheads["forward"];
+		if (edge.direction === "forward") {
+			arrow.marker("end", marker);
+		} else {
+			arrow.marker("start", marker);
+		}
 	}
 
 	private render_lifeline(node: Node) {

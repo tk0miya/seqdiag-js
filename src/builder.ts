@@ -82,6 +82,7 @@ export class Edge {
 	op: string;
 	to: Node;
 
+	asynchronous: boolean;
 	direction: "forward" | "back";
 	style: "solid" | "dashed";
 
@@ -90,6 +91,7 @@ export class Edge {
 		this.op = op;
 		this.to = to;
 
+		this.asynchronous = op.startsWith("<<") || op.endsWith(">>");
 		this.direction = op.endsWith(">") ? "forward" : "back";
 		this.style = op.includes("--") ? "dashed" : "solid";
 	}

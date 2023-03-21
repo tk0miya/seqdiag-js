@@ -33,7 +33,7 @@ describe("buildDiagram()", () => {
 		});
 
 		it("can build a diagram having edge definitions", () => {
-			const ast = parse("seqdiag { A --> B -> C; D => E => F }");
+			const ast = parse("seqdiag { A --> B ->> C; D => E => F }");
 			const diagram = buildDiagram(ast);
 			assert(diagram !== undefined);
 			expect(diagram.edges.length).toBe(6);
@@ -41,13 +41,15 @@ describe("buildDiagram()", () => {
 				from: { id: "A" },
 				op: "-->",
 				to: { id: "B" },
+				asynchronous: false,
 				direction: "forward",
 				style: "dashed",
 			});
 			expect(diagram.edges[1]).toMatchObject({
 				from: { id: "B" },
-				op: "->",
+				op: "->>",
 				to: { id: "C" },
+				asynchronous: true,
 				direction: "forward",
 				style: "solid",
 			});
@@ -55,6 +57,7 @@ describe("buildDiagram()", () => {
 				from: { id: "D" },
 				op: "->",
 				to: { id: "E" },
+				asynchronous: false,
 				direction: "forward",
 				style: "solid",
 			});
@@ -62,6 +65,7 @@ describe("buildDiagram()", () => {
 				from: { id: "E" },
 				op: "->",
 				to: { id: "F" },
+				asynchronous: false,
 				direction: "forward",
 				style: "solid",
 			});
@@ -69,6 +73,7 @@ describe("buildDiagram()", () => {
 				from: { id: "E" },
 				op: "<-",
 				to: { id: "F" },
+				asynchronous: false,
 				direction: "back",
 				style: "solid",
 			});
@@ -76,6 +81,7 @@ describe("buildDiagram()", () => {
 				from: { id: "D" },
 				op: "<-",
 				to: { id: "E" },
+				asynchronous: false,
 				direction: "back",
 				style: "solid",
 			});

@@ -42,7 +42,13 @@ export class DiagramRenderer {
 	}
 
 	private initialize_arrowheads() {
-		this.arrowheads["forward"] = this.drawer
+		this.arrowheads["sync"] = this.drawer
+			.marker(10, 10, function (marker) {
+				marker.path("M 0 0 L 10 5 L 0 10");
+			})
+			.ref(10, 5)
+			.orient("auto-start-reverse");
+		this.arrowheads["async"] = this.drawer
 			.marker(10, 10, function (marker) {
 				marker.line(0, 0, 10, 5).stroke("black");
 				marker.line(0, 10, 10, 5).stroke("black");
@@ -59,7 +65,7 @@ export class DiagramRenderer {
 			arrow.stroke({ dasharray: "2" });
 		}
 
-		const marker = this.arrowheads["forward"];
+		const marker = edge.asynchronous ? this.arrowheads["async"] : this.arrowheads["sync"];
 		if (edge.direction === "forward") {
 			arrow.marker("end", marker);
 		} else {

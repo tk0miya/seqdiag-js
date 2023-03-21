@@ -55,6 +55,10 @@ export class DiagramRenderer {
 		const box = this.metrics.edge(edge);
 		const arrow = this.drawer.line(box.left(), box.top(), box.right(), box.bottom()).stroke("black");
 
+		if (edge.style === "dashed") {
+			arrow.stroke({ dasharray: "2" });
+		}
+
 		const marker = this.arrowheads["forward"];
 		if (edge.direction === "forward") {
 			arrow.marker("end", marker);

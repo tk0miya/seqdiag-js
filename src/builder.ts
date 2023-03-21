@@ -78,21 +78,20 @@ export class Node extends Configurable {
 }
 
 export class Edge {
-	direction: "forward" | "back";
 	from: Node;
 	op: string;
 	to: Node;
+
+	direction: "forward" | "back";
+	style: "solid" | "dashed";
 
 	constructor(diagram: Diagram, from: Node, op: string, to: Node) {
 		this.from = from;
 		this.op = op;
 		this.to = to;
 
-		if (op.endsWith(">")) {
-			this.direction = "forward";
-		} else {
-			this.direction = "back";
-		}
+		this.direction = op.endsWith(">") ? "forward" : "back";
+		this.style = op.includes("--") ? "dashed" : "solid";
 	}
 }
 

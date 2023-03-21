@@ -1,6 +1,6 @@
 import { Diagram, Node } from "./builder";
 import { Metrics } from "./metrics";
-import { SVG, Svg } from "@svgdotjs/svg.js";
+import { Marker, SVG, Svg } from "@svgdotjs/svg.js";
 
 // https://stackoverflow.com/a/8084248
 function generateElementId() {
@@ -26,10 +26,16 @@ export class DiagramRenderer {
 
 		this.diagram.nodes.forEach((node) => {
 			this.render_node(node);
+			this.render_lifeline(node);
 		});
 
 		this.element.id ||= generateElementId();
 		this.drawer.addTo(`#${this.element.id}`);
+	}
+
+	private render_lifeline(node: Node) {
+		const box = this.metrics.lifeline(node);
+		this.drawer.line(box.left(), box.top(), box.right(), box.bottom()).stroke({ color: "black", dasharray: "8,4" });
 	}
 
 	private render_node(node: Node) {

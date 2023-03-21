@@ -94,6 +94,17 @@ describe("buildDiagram()", () => {
 			expect(diagram.nodes[5]).toMatchObject({ id: "F", label: "F" });
 		});
 
+		it("can build a diagram having a diagonal edge definition", () => {
+			const ast = parse("seqdiag { A -> B [diagonal] }");
+			const diagram = buildDiagram(ast);
+			assert(diagram !== undefined);
+			expect(diagram.edges.length).toBe(1);
+			expect(diagram.edges[0]).toMatchObject({ from: { id: "A" }, op: "->", to: { id: "B" }, diagonal: true });
+			expect(diagram.nodes.length).toBe(2);
+			expect(diagram.nodes[0]).toMatchObject({ id: "A", label: "A" });
+			expect(diagram.nodes[1]).toMatchObject({ id: "B", label: "B" });
+		});
+
 		it("can assign attributes to the diagram", () => {
 			const ast = parse(`seqdiag {
 								 node_height = 123;

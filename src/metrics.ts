@@ -76,7 +76,7 @@ export class Metrics {
 		this.heights.push(Math.max(...node_heights));
 		this.diagram.edges.forEach((edge) => {
 			this.heights.push(this.diagram.spanHeight);
-			this.heights.push(0);
+			this.heights.push(this.edge(edge).height);
 		});
 		this.heights.push(this.diagram.spanHeight);
 		this.heights.push(this.diagram.spanHeight);
@@ -113,7 +113,9 @@ export class Metrics {
 		const x1 = nodes[0].center().x;
 		const x2 = nodes[1].center().x;
 		const y = this.heights.slice(0, index * 2 + 3).reduce((a, b) => a + b, 0);
+		const width = edge.failed ? (x2 - x1) / 2 : x2 - x1;
+		const height = edge.diagonal ? (this.diagram.nodeHeight * 3) / 4 : 0;
 
-		return new Box(x1, y, x2 - x1, 1);
+		return new Box(x1, y, width, height);
 	}
 }

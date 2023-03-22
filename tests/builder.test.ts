@@ -33,16 +33,58 @@ describe("buildDiagram()", () => {
 		});
 
 		it("can build a diagram having edge definitions", () => {
-			const ast = parse("seqdiag { A -> B -> C; D => E => F }");
+			const ast = parse("seqdiag { A --> B ->> C; D => E => F }");
 			const diagram = buildDiagram(ast);
 			assert(diagram !== undefined);
 			expect(diagram.edges.length).toBe(6);
-			expect(diagram.edges[0]).toMatchObject({ from: { id: "A" }, op: "->", to: { id: "B" }, direction: "forward" });
-			expect(diagram.edges[1]).toMatchObject({ from: { id: "B" }, op: "->", to: { id: "C" }, direction: "forward" });
-			expect(diagram.edges[2]).toMatchObject({ from: { id: "D" }, op: "->", to: { id: "E" }, direction: "forward" });
-			expect(diagram.edges[3]).toMatchObject({ from: { id: "E" }, op: "->", to: { id: "F" }, direction: "forward" });
-			expect(diagram.edges[4]).toMatchObject({ from: { id: "E" }, op: "<-", to: { id: "F" }, direction: "back" });
-			expect(diagram.edges[5]).toMatchObject({ from: { id: "D" }, op: "<-", to: { id: "E" }, direction: "back" });
+			expect(diagram.edges[0]).toMatchObject({
+				from: { id: "A" },
+				op: "-->",
+				to: { id: "B" },
+				asynchronous: false,
+				direction: "forward",
+				style: "dashed",
+			});
+			expect(diagram.edges[1]).toMatchObject({
+				from: { id: "B" },
+				op: "->>",
+				to: { id: "C" },
+				asynchronous: true,
+				direction: "forward",
+				style: "solid",
+			});
+			expect(diagram.edges[2]).toMatchObject({
+				from: { id: "D" },
+				op: "->",
+				to: { id: "E" },
+				asynchronous: false,
+				direction: "forward",
+				style: "solid",
+			});
+			expect(diagram.edges[3]).toMatchObject({
+				from: { id: "E" },
+				op: "->",
+				to: { id: "F" },
+				asynchronous: false,
+				direction: "forward",
+				style: "solid",
+			});
+			expect(diagram.edges[4]).toMatchObject({
+				from: { id: "E" },
+				op: "<-",
+				to: { id: "F" },
+				asynchronous: false,
+				direction: "back",
+				style: "solid",
+			});
+			expect(diagram.edges[5]).toMatchObject({
+				from: { id: "D" },
+				op: "<-",
+				to: { id: "E" },
+				asynchronous: false,
+				direction: "back",
+				style: "solid",
+			});
 			expect(diagram.nodes.length).toBe(6);
 			expect(diagram.nodes[0]).toMatchObject({ id: "A", label: "A" });
 			expect(diagram.nodes[1]).toMatchObject({ id: "B", label: "B" });
@@ -50,6 +92,17 @@ describe("buildDiagram()", () => {
 			expect(diagram.nodes[3]).toMatchObject({ id: "D", label: "D" });
 			expect(diagram.nodes[4]).toMatchObject({ id: "E", label: "E" });
 			expect(diagram.nodes[5]).toMatchObject({ id: "F", label: "F" });
+		});
+
+		it("can build a diagram having a diagonal edge definition", () => {
+			const ast = parse("seqdiag { A -> B [diagonal] }");
+			const diagram = buildDiagram(ast);
+			assert(diagram !== undefined);
+			expect(diagram.edges.length).toBe(1);
+			expect(diagram.edges[0]).toMatchObject({ from: { id: "A" }, op: "->", to: { id: "B" }, diagonal: true });
+			expect(diagram.nodes.length).toBe(2);
+			expect(diagram.nodes[0]).toMatchObject({ id: "A", label: "A" });
+			expect(diagram.nodes[1]).toMatchObject({ id: "B", label: "B" });
 		});
 
 		it("can assign attributes to the diagram", () => {

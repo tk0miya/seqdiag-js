@@ -2,11 +2,14 @@ import * as parser from "./parser";
 import { ASTKinds } from "./parser";
 
 interface IConfigurable<T> {
+	booleanFields: { [key: string]: keyof T };
 	integerFields: { [key: string]: keyof T };
+	setBooleanAttribute(name: string, value: string | number | undefined, propName: keyof T): void;
 	setIntegerAttribute(name: string, value: string | number | undefined, propName: keyof T): void;
 }
 
 class Configurable {
+	booleanFields: { [key: string]: string } = {};
 	integerFields: { [key: string]: string } = {};
 
 	setAttributes(statements: parser.attribute_stmt[] | parser.option_stmt[]) {
@@ -16,10 +19,20 @@ class Configurable {
 	}
 
 	setAttribute<T>(this: IConfigurable<T>, name: string, value: string | number | undefined) {
-		if (name in this.integerFields) {
+		if (name in this.booleanFields) {
+			this.setBooleanAttribute(name, value, this.booleanFields[name]);
+		} else if (name in this.integerFields) {
 			this.setIntegerAttribute(name, value, this.integerFields[name]);
 		} else {
 			console.log(`unknown attribute: ${name}`);
+		}
+	}
+
+	setBooleanAttribute<T>(this: T, name: string, value: string | number | undefined, propName: keyof T) {
+		if (value === "false") {
+			this[propName] = false as never;
+		} else {
+			this[propName] = true as never;
 		}
 	}
 
@@ -77,22 +90,31 @@ export class Node extends Configurable {
 	}
 }
 
-export class Edge {
-	direction: "forward" | "back";
+export class Edge extends Configurable {
 	from: Node;
 	op: string;
 	to: Node;
 
+	asynchronous: boolean;
+	diagonal = false;
+	direction: "forward" | "back";
+	failed = false;
+	style: "solid" | "dashed";
+
+	booleanFields: { [key: string]: keyof Edge } = {
+		diagonal: "diagonal",
+		failed: "failed",
+	};
+
 	constructor(diagram: Diagram, from: Node, op: string, to: Node) {
+		super();
 		this.from = from;
 		this.op = op;
 		this.to = to;
 
-		if (op.endsWith(">")) {
-			this.direction = "forward";
-		} else {
-			this.direction = "back";
-		}
+		this.asynchronous = op.startsWith("<<") || op.endsWith(">>");
+		this.direction = op.endsWith(">") ? "forward" : "back";
+		this.style = op.includes("--") ? "dashed" : "solid";
 	}
 }
 
@@ -153,6 +175,7 @@ class DiagramBuilder {
 		} else {
 			edge = new Edge(this.diagram, from, op, to);
 		}
+		edge.setAttributes(stmt.options);
 		this.diagram.edges.push(edge);
 
 		if (stmt.to.length > index + 1) {

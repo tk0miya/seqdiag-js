@@ -107,15 +107,27 @@ export class Metrics {
 	edge(edge: Edge): Box {
 		const index = this.diagram.edges.indexOf(edge);
 
-		const nodes = [this.node(edge.from), this.node(edge.to)];
-		nodes.sort((a, b) => a.left() - b.left());
+		if (edge.is_self_referenced()) {
+			const i = this.diagram.nodes.indexOf(edge.from);
 
-		const x1 = nodes[0].center().x;
-		const x2 = nodes[1].center().x;
-		const y = this.heights.slice(0, index * 2 + 3).reduce((a, b) => a + b, 0);
-		const width = edge.failed ? (x2 - x1) / 2 : x2 - x1;
-		const height = edge.diagonal ? (this.diagram.nodeHeight * 3) / 4 : 0;
+			const node = this.node(edge.from);
+			const x = node.center().x;
+			const y = this.heights.slice(0, index * 2 + 3).reduce((a, b) => a + b, 0);
+			const width = node.width / 2 + this.widths[i * 2] / 2;
+			const height = this.diagram.nodeHeight;
 
-		return new Box(x1, y, width, height);
+			return new Box(x, y, width, height);
+		} else {
+			const nodes = [this.node(edge.from), this.node(edge.to)];
+			nodes.sort((a, b) => a.left() - b.left());
+
+			const x1 = nodes[0].center().x;
+			const x2 = nodes[1].center().x;
+			const y = this.heights.slice(0, index * 2 + 3).reduce((a, b) => a + b, 0);
+			const width = edge.failed ? (x2 - x1) / 2 : x2 - x1;
+			const height = edge.diagonal ? (this.diagram.nodeHeight * 3) / 4 : 0;
+
+			return new Box(x1, y, width, height);
+		}
 	}
 }

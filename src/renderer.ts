@@ -91,18 +91,14 @@ export class DiagramRenderer {
 
 		const [textWidth, textHeight] = this.textSize(node.label);
 		const x = box.left() + box.width / 2 - textWidth / 2;
-		const y = box.top() + box.height / 2 - textHeight;
+		const y = box.top() + box.height / 2 - textHeight / 2;
 		this.drawer.text(node.label).move(x, y);
 	}
 
 	private textSize(s: string): [number, number] {
-		const canvas = document.createElement("canvas");
-		const context = canvas.getContext("2d");
-		if (context) {
-			const metrics = context.measureText(s);
-			return [metrics.width, metrics.actualBoundingBoxAscent];
-		} else {
-			return [0, 0];
-		}
+		const text = this.drawer.text(s);
+		const bbox = text.bbox();
+		text.remove();
+		return [bbox.width, bbox.height];
 	}
 }

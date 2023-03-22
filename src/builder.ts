@@ -4,13 +4,16 @@ import { ASTKinds } from "./parser";
 interface IConfigurable<T> {
 	booleanFields: { [key: string]: keyof T };
 	integerFields: { [key: string]: keyof T };
+	stringFields: { [key: string]: keyof T };
 	setBooleanAttribute(name: string, value: string | number | undefined, propName: keyof T): void;
 	setIntegerAttribute(name: string, value: string | number | undefined, propName: keyof T): void;
+	setStringAttribute(name: string, value: string | number | undefined, propName: keyof T): void;
 }
 
 class Configurable {
 	booleanFields: { [key: string]: string } = {};
 	integerFields: { [key: string]: string } = {};
+	stringFields: { [key: string]: string } = {};
 
 	setAttributes(statements: parser.attribute_stmt[] | parser.option_stmt[]) {
 		statements.forEach((stmt) => {
@@ -23,6 +26,8 @@ class Configurable {
 			this.setBooleanAttribute(name, value, this.booleanFields[name]);
 		} else if (name in this.integerFields) {
 			this.setIntegerAttribute(name, value, this.integerFields[name]);
+		} else if (name in this.stringFields) {
+			this.setStringAttribute(name, value, this.stringFields[name]);
 		} else {
 			console.log(`unknown attribute: ${name}`);
 		}
@@ -39,6 +44,14 @@ class Configurable {
 	setIntegerAttribute<T>(this: T, name: string, value: string | number | undefined, propName: keyof T) {
 		if (typeof value === "number") {
 			this[propName] = value as never;
+		} else {
+			console.log(`unknown ${name}: ${value}`);
+		}
+	}
+
+	setStringAttribute<T>(this: T, name: string, value: string | number | undefined, propName: keyof T) {
+		if (value !== undefined) {
+			this[propName] = value.toString() as never;
 		} else {
 			console.log(`unknown ${name}: ${value}`);
 		}
@@ -78,6 +91,9 @@ export class Node extends Configurable {
 	integerFields: { [key: string]: keyof Node } = {
 		height: "height",
 		width: "width",
+	};
+	stringFields: { [key: string]: keyof Node } = {
+		label: "label",
 	};
 
 	constructor(diagram: Diagram, node_id: string) {

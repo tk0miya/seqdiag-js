@@ -1,5 +1,5 @@
 import { Diagram, Edge, Node } from "./builder";
-import { Metrics } from "./metrics";
+import { Metrics, Size } from "./metrics";
 import { Marker, SVG, Svg } from "@svgdotjs/svg.js";
 
 // https://stackoverflow.com/a/8084248
@@ -103,16 +103,16 @@ export class DiagramRenderer {
 		const box = this.metrics.node(node);
 		this.drawer.rect(box.width, box.height).fill("white").stroke("black").move(box.left(), box.top());
 
-		const [textWidth, textHeight] = this.textSize(node.label);
-		const x = box.left() + box.width / 2 - textWidth / 2;
-		const y = box.top() + box.height / 2 - textHeight / 2;
+		const text = this.textSize(node.label);
+		const x = box.left() + box.width / 2 - text.width / 2;
+		const y = box.top() + box.height / 2 - text.height / 2;
 		this.drawer.text(node.label).move(x, y);
 	}
 
-	private textSize(s: string): [number, number] {
+	private textSize(s: string): Size {
 		const text = this.drawer.text(s);
 		const bbox = text.bbox();
 		text.remove();
-		return [bbox.width, bbox.height];
+		return new Size(bbox.width, bbox.height);
 	}
 }

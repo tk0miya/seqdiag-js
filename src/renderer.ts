@@ -59,7 +59,21 @@ export class DiagramRenderer {
 
 	private render_edge(edge: Edge) {
 		const box = this.metrics.edge(edge);
-		const arrow = this.drawer.line(box.left(), box.top(), box.right(), box.bottom()).stroke("black");
+		let arrow;
+
+		if (edge.is_self_referenced()) {
+			const points = [box.left(), box.top(), box.right(), box.top(), box.right(), box.bottom()];
+			if (edge.failed) {
+				points.push(box.center().x);
+				points.push(box.bottom());
+			} else {
+				points.push(box.left());
+				points.push(box.bottom());
+			}
+			arrow = this.drawer.polyline(points).fill("none").stroke("black");
+		} else {
+			arrow = this.drawer.line(box.left(), box.top(), box.right(), box.bottom()).stroke("black");
+		}
 
 		if (edge.style === "dashed") {
 			arrow.stroke({ dasharray: "2" });
@@ -73,7 +87,7 @@ export class DiagramRenderer {
 		}
 
 		if (edge.failed) {
-			const x = box.right() + 16;
+			const x = edge.is_self_referenced() ? box.center().x - 16 : box.right() + 16;
 			const y = box.bottom();
 			this.drawer.line(x - 8, y - 8, x + 8, y + 8).stroke("black");
 			this.drawer.line(x - 8, y + 8, x + 8, y - 8).stroke("black");

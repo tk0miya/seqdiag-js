@@ -116,6 +116,10 @@ export class Edge extends Configurable {
 		this.direction = op.endsWith(">") ? "forward" : "back";
 		this.style = op.includes("--") ? "dashed" : "solid";
 	}
+
+	is_self_referenced(): boolean {
+		return this.from === this.to;
+	}
 }
 
 class DiagramBuilder {

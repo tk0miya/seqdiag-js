@@ -1,4 +1,5 @@
 import { Diagram, Node, Edge } from "./builder";
+import { DiagramRenderer } from "./renderer";
 
 export class Size {
 	height: number;
@@ -52,10 +53,12 @@ export class Box extends Size {
 export class Metrics {
 	diagram: Diagram;
 	heights: number[];
+	renderer: DiagramRenderer;
 	widths: number[];
 
-	constructor(diagram: Diagram) {
+	constructor(diagram: Diagram, renderer: DiagramRenderer) {
 		this.diagram = diagram;
+		this.renderer = renderer;
 		this.widths = [];
 		this.heights = [];
 
@@ -129,5 +132,9 @@ export class Metrics {
 
 			return new Box(x1, y, width, height);
 		}
+	}
+
+	textSize(s: string): Size {
+		return this.renderer.textSize(s);
 	}
 }

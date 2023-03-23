@@ -17,7 +17,7 @@ export class DiagramRenderer {
 		this.diagram = diagram;
 		this.element = element;
 		this.drawer = SVG();
-		this.metrics = new Metrics(diagram);
+		this.metrics = new Metrics(diagram, this);
 	}
 
 	render() {
@@ -105,7 +105,7 @@ export class DiagramRenderer {
 		this.drawer.text(node.label).move(x, y);
 	}
 
-	private textSize(s: string): Size {
+	textSize(s: string): Size {
 		const text = this.drawer.text(s);
 		const bbox = text.bbox();
 		text.remove();

@@ -116,6 +116,7 @@ export class Edge extends Configurable {
 	diagonal = false;
 	direction: "forward" | "back";
 	failed = false;
+	label = "";
 	style: "solid" | "dashed";
 
 	booleanFields: { [key: string]: keyof Edge } = {
@@ -124,6 +125,7 @@ export class Edge extends Configurable {
 	};
 	stringFields: { [key: string]: keyof Edge } = {
 		color: "color",
+		label: "label",
 	};
 
 	constructor(diagram: Diagram, from: Node, op: string, to: Node) {

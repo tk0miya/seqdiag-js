@@ -8,14 +8,12 @@ function generateElementId() {
 }
 
 export class DiagramRenderer {
-	arrowheads: { [key: string]: Marker };
 	diagram: Diagram;
 	drawer: Svg;
 	element: Element;
 	metrics: Metrics;
 
 	constructor(diagram: Diagram, element: Element) {
-		this.arrowheads = {};
 		this.diagram = diagram;
 		this.element = element;
 		this.drawer = SVG();
@@ -23,8 +21,6 @@ export class DiagramRenderer {
 	}
 
 	render() {
-		this.initialize_arrowheads();
-
 		const size = this.metrics.size();
 		this.drawer.size(size.width, size.height);
 
@@ -41,20 +37,20 @@ export class DiagramRenderer {
 		this.drawer.addTo(`#${this.element.id}`);
 	}
 
-	private initialize_arrowheads() {
-		this.arrowheads["sync"] = this.drawer
-			.marker(10, 10, function (marker) {
-				marker.path("M 0 0 L 10 5 L 0 10");
-			})
-			.ref(10, 5)
-			.orient("auto-start-reverse");
-		this.arrowheads["async"] = this.drawer
-			.marker(10, 10, function (marker) {
+	private render_arrowheads(asynchronous: boolean): Marker {
+		let callback;
+		if (asynchronous) {
+			callback = (marker: Marker) => {
 				marker.line(0, 0, 10, 5).stroke("black");
 				marker.line(0, 10, 10, 5).stroke("black");
-			})
-			.ref(10, 5)
-			.orient("auto-start-reverse");
+			};
+		} else {
+			callback = (marker: Marker) => {
+				marker.path("M 0 0 L 10 5 L 0 10");
+			};
+		}
+
+		return this.drawer.marker(10, 10, callback).ref(10, 5).orient("auto-start-reverse");
 	}
 
 	private render_edge(edge: Edge) {
@@ -79,7 +75,7 @@ export class DiagramRenderer {
 			arrow.stroke({ dasharray: "2" });
 		}
 
-		const marker = edge.asynchronous ? this.arrowheads["async"] : this.arrowheads["sync"];
+		const marker = this.render_arrowheads(edge.asynchronous);
 		if (edge.direction === "forward") {
 			arrow.marker("end", marker);
 		} else {

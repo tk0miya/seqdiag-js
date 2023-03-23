@@ -204,6 +204,7 @@ class DiagramBuilder {
 
 		if (op === "=>") {
 			edge = new Edge(this.diagram, from, "<-", to);
+			edge.style = "dashed";
 			this.diagram.edges.push(edge);
 		}
 	}

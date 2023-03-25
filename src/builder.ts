@@ -154,7 +154,7 @@ export class Edge extends Configurable {
 		this.style = op.includes("--") ? "dashed" : "solid";
 	}
 
-	is_self_referenced(): boolean {
+	isSelfReferenced(): boolean {
 		return this.from === this.to;
 	}
 }
@@ -176,39 +176,39 @@ class DiagramBuilder {
 		ast.statements.forEach((stmt) => {
 			switch (stmt.kind) {
 				case ASTKinds.node_stmt:
-					this.build_node(stmt);
+					this.buildNode(stmt);
 					break;
 				case ASTKinds.edge_stmt:
-					this.build_edge(stmt);
+					this.buildEdge(stmt);
 					break;
 			}
 		});
 	}
 
-	private build_node(stmt: parser.node_stmt): void {
-		const node = this.find_or_build_node(stmt.name);
+	private buildNode(stmt: parser.node_stmt): void {
+		const node = this.findOrBuildNode(stmt.name);
 		node.setAttributes(stmt.options);
 	}
 
-	private find_or_build_node(name: string): Node {
+	private findOrBuildNode(name: string): Node {
 		const node = this.diagram.nodes.find((node) => node.id === name);
 		if (node) {
 			return node;
 		} else {
-			const new_node = new Node(this.diagram, name);
-			this.diagram.nodes.push(new_node);
-			return new_node;
+			const newNode = new Node(this.diagram, name);
+			this.diagram.nodes.push(newNode);
+			return newNode;
 		}
 	}
 
-	private build_edge(stmt: parser.edge_stmt) {
-		const from = this.find_or_build_node(stmt.from);
-		this.build_edge_sub(stmt, from, 0);
+	private buildEdge(stmt: parser.edge_stmt) {
+		const from = this.findOrBuildNode(stmt.from);
+		this.buildEdgeSub(stmt, from, 0);
 	}
 
-	private build_edge_sub(stmt: parser.edge_stmt, from: Node, index: number) {
+	private buildEdgeSub(stmt: parser.edge_stmt, from: Node, index: number) {
 		const { op, target } = stmt.to[index];
-		const to = this.find_or_build_node(target);
+		const to = this.findOrBuildNode(target);
 
 		let edge;
 		if (op === "=>") {
@@ -220,7 +220,7 @@ class DiagramBuilder {
 		this.diagram.edges.push(edge);
 
 		if (stmt.to.length > index + 1) {
-			this.build_edge_sub(stmt, to, index + 1);
+			this.buildEdgeSub(stmt, to, index + 1);
 		}
 
 		if (op === "=>") {

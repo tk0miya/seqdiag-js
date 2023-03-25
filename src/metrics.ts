@@ -75,8 +75,8 @@ export class Metrics {
 
 		// heights
 		this.heights.push(this.diagram.spanHeight);
-		const node_heights = this.diagram.nodes.map((node) => node.height);
-		this.heights.push(Math.max(...node_heights));
+		const nodeHeights = this.diagram.nodes.map((node) => node.height);
+		this.heights.push(Math.max(...nodeHeights));
 		this.diagram.edges.forEach((edge) => {
 			this.heights.push(this.diagram.spanHeight);
 			this.heights.push(this.edge(edge).height);
@@ -114,7 +114,7 @@ export class Metrics {
 			textHeight = this.textSize(edge.label).height;
 		}
 
-		if (edge.is_self_referenced()) {
+		if (edge.isSelfReferenced()) {
 			const i = this.diagram.nodes.indexOf(edge.from);
 
 			const node = this.node(edge.from);

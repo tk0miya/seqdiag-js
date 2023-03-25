@@ -102,7 +102,9 @@ export class DiagramRenderer {
 
 	private render_lifeline(node: Node) {
 		const box = this.metrics.lifeline(node);
-		this.drawer.line(box.left(), box.top(), box.right(), box.bottom()).stroke({ color: "black", dasharray: "8,4" });
+		this.drawer
+			.line(box.left(), box.top(), box.right(), box.bottom())
+			.stroke({ color: this.diagram.defaultLineColor, dasharray: "8,4" });
 	}
 
 	private render_node(node: Node) {

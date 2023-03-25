@@ -62,6 +62,7 @@ export class Diagram extends Configurable {
 	edges: Edge[];
 	nodes: Node[];
 
+	defaultLineColor = "black";
 	nodeHeight = 40;
 	nodeWidth = 120;
 	spanHeight = 20;
@@ -72,6 +73,9 @@ export class Diagram extends Configurable {
 		node_width: "nodeWidth",
 		span_height: "spanHeight",
 		span_width: "spanWidth",
+	};
+	stringFields: { [key: string]: keyof Diagram } = {
+		default_linecolor: "defaultLineColor",
 	};
 
 	constructor() {
@@ -87,7 +91,7 @@ export class Node extends Configurable {
 
 	color = "white";
 	height: number;
-	lineColor = "black";
+	lineColor: string;
 	width: number;
 
 	integerFields: { [key: string]: keyof Node } = {
@@ -106,6 +110,7 @@ export class Node extends Configurable {
 		this.label = node_id;
 
 		this.height = diagram.nodeHeight;
+		this.lineColor = diagram.defaultLineColor;
 		this.width = diagram.nodeWidth;
 	}
 }
@@ -116,7 +121,7 @@ export class Edge extends Configurable {
 	to: Node;
 
 	asynchronous: boolean;
-	color = "black";
+	color;
 	diagonal = false;
 	direction: "forward" | "back";
 	failed = false;
@@ -141,6 +146,7 @@ export class Edge extends Configurable {
 		this.to = to;
 
 		this.asynchronous = op.startsWith("<<") || op.endsWith(">>");
+		this.color = diagram.defaultLineColor;
 		this.direction = op.endsWith(">") ? "forward" : "back";
 		this.style = op.includes("--") ? "dashed" : "solid";
 	}

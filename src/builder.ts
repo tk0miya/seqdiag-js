@@ -59,6 +59,8 @@ class Configurable {
 }
 
 export class Diagram extends Configurable {
+	activationBars: ActivationBar[];
+	activationDepths: { [key: string]: number[] };
 	edges: Edge[];
 	nodes: Node[];
 
@@ -82,6 +84,8 @@ export class Diagram extends Configurable {
 
 	constructor() {
 		super();
+		this.activationBars = [];
+		this.activationDepths = {};
 		this.edges = [];
 		this.nodes = [];
 	}
@@ -159,6 +163,20 @@ export class Edge extends Configurable {
 	}
 }
 
+export class ActivationBar {
+	node: Node;
+	from: Edge;
+	to?: Edge;
+	depth: number;
+
+	constructor(node: Node, from: Edge, to: Edge | undefined, depth: number) {
+		this.node = node;
+		this.from = from;
+		this.to = to;
+		this.depth = depth;
+	}
+}
+
 class DiagramBuilder {
 	diagram: Diagram;
 
@@ -181,6 +199,57 @@ class DiagramBuilder {
 				case ASTKinds.edge_stmt:
 					this.buildEdge(stmt);
 					break;
+			}
+		});
+
+		this.buildActivationBars();
+	}
+
+	private buildActivationBars() {
+		const depths: { [key: string]: number } = {};
+
+		if (this.diagram.edges.length === 0) {
+			return;
+		}
+
+		this.diagram.activationBars.push(new ActivationBar(this.diagram.nodes[0], this.diagram.edges[0], undefined, 1));
+		this.diagram.nodes.forEach((node, index) => {
+			this.diagram.activationDepths[node.id] = [];
+			depths[node.id] = index === 0 ? 1 : 0;
+		});
+
+		this.diagram.edges.forEach((edge) => {
+			if (edge.isSelfReferenced() || edge.failed) {
+				// No activation bar
+				Object.keys(depths).forEach((nodeId) => {
+					this.diagram.activationDepths[nodeId].push(depths[nodeId]);
+				});
+			} else {
+				if (edge.direction === "forward") {
+					const depth = (depths[edge.to.id] || 0) + 1;
+					this.diagram.activationBars.push(new ActivationBar(edge.to, edge, undefined, depth));
+					depths[edge.to.id] = depth;
+				}
+
+				Object.keys(depths).forEach((nodeId) => {
+					this.diagram.activationDepths[nodeId].push(depths[nodeId]);
+				});
+
+				if (edge.direction === "back") {
+					const activationBar = this.diagram.activationBars.findLast((bar) => {
+						return bar.node === edge.to && bar.to === undefined;
+					});
+					if (activationBar) {
+						activationBar.to = edge;
+						depths[edge.to.id] -= 1;
+					}
+				}
+			}
+		});
+
+		this.diagram.activationBars.forEach((bar) => {
+			if (bar.to === undefined) {
+				bar.to = this.diagram.edges.slice(-1)[0];
 			}
 		});
 	}

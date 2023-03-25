@@ -3,7 +3,8 @@
         "bbox",
         "linecolor",
         "seqdiag",
-        "svgdotjs"
+        "svgdotjs",
+        "textcolor"
     ],
     "typescript.tsdk": "node_modules/typescript/lib"
 }

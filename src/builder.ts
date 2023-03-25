@@ -66,6 +66,7 @@ export class Diagram extends Configurable {
 
 	defaultLineColor = "black";
 	defaultNodeColor = "white";
+	defaultTextColor = "black";
 	nodeHeight = 40;
 	nodeWidth = 120;
 	spanHeight = 20;
@@ -80,6 +81,7 @@ export class Diagram extends Configurable {
 	stringFields: { [key: string]: keyof Diagram } = {
 		default_linecolor: "defaultLineColor",
 		default_node_color: "defaultNodeColor",
+		default_textcolor: "defaultTextColor",
 	};
 
 	constructor() {
@@ -98,6 +100,7 @@ export class Node extends Configurable {
 	color: string;
 	height: number;
 	lineColor: string;
+	textColor: string;
 	width: number;
 
 	integerFields: { [key: string]: keyof Node } = {
@@ -108,6 +111,7 @@ export class Node extends Configurable {
 		color: "color",
 		label: "label",
 		linecolor: "lineColor",
+		textcolor: "textColor",
 	};
 
 	constructor(diagram: Diagram, node_id: string) {
@@ -118,6 +122,7 @@ export class Node extends Configurable {
 		this.color = diagram.defaultNodeColor;
 		this.height = diagram.nodeHeight;
 		this.lineColor = diagram.defaultLineColor;
+		this.textColor = diagram.defaultTextColor;
 		this.width = diagram.nodeWidth;
 	}
 }
@@ -128,13 +133,14 @@ export class Edge extends Configurable {
 	to: Node;
 
 	asynchronous: boolean;
-	color;
+	color: string;
 	diagonal = false;
 	direction: "forward" | "back";
 	failed = false;
 	label = "";
 	return = "";
 	style: "solid" | "dashed";
+	textColor: string;
 
 	booleanFields: { [key: string]: keyof Edge } = {
 		diagonal: "diagonal",
@@ -144,6 +150,7 @@ export class Edge extends Configurable {
 		color: "color",
 		label: "label",
 		return: "return",
+		textcolor: "textColor",
 	};
 
 	constructor(diagram: Diagram, from: Node, op: string, to: Node) {
@@ -156,6 +163,7 @@ export class Edge extends Configurable {
 		this.color = diagram.defaultLineColor;
 		this.direction = op.endsWith(">") ? "forward" : "back";
 		this.style = op.includes("--") ? "dashed" : "solid";
+		this.textColor = diagram.defaultTextColor;
 	}
 
 	isSelfReferenced(): boolean {

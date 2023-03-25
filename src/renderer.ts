@@ -8,14 +8,12 @@ function generateElementId() {
 }
 
 export class DiagramRenderer {
-	arrowheads: { [key: string]: Marker };
 	diagram: Diagram;
 	drawer: Svg;
 	element: Element;
 	metrics: Metrics;
 
 	constructor(diagram: Diagram, element: Element) {
-		this.arrowheads = {};
 		this.diagram = diagram;
 		this.element = element;
 		this.drawer = SVG();
@@ -23,8 +21,6 @@ export class DiagramRenderer {
 	}
 
 	render() {
-		this.initialize_arrowheads();
-
 		const size = this.metrics.size();
 		this.drawer.size(size.width, size.height);
 
@@ -41,20 +37,20 @@ export class DiagramRenderer {
 		this.drawer.addTo(`#${this.element.id}`);
 	}
 
-	private initialize_arrowheads() {
-		this.arrowheads["sync"] = this.drawer
-			.marker(10, 10, function (marker) {
-				marker.path("M 0 0 L 10 5 L 0 10");
-			})
-			.ref(10, 5)
-			.orient("auto-start-reverse");
-		this.arrowheads["async"] = this.drawer
-			.marker(10, 10, function (marker) {
-				marker.line(0, 0, 10, 5).stroke("black");
-				marker.line(0, 10, 10, 5).stroke("black");
-			})
-			.ref(10, 5)
-			.orient("auto-start-reverse");
+	private render_arrowheads(asynchronous: boolean, color: string): Marker {
+		let callback;
+		if (asynchronous) {
+			callback = (marker: Marker) => {
+				marker.line(0, 0, 10, 5).stroke(color);
+				marker.line(0, 10, 10, 5).stroke(color);
+			};
+		} else {
+			callback = (marker: Marker) => {
+				marker.path("M 0 0 L 10 5 L 0 10").fill(color);
+			};
+		}
+
+		return this.drawer.marker(10, 10, callback).ref(10, 5).orient("auto-start-reverse");
 	}
 
 	private render_edge(edge: Edge) {
@@ -70,16 +66,16 @@ export class DiagramRenderer {
 				points.push(box.left());
 				points.push(box.bottom());
 			}
-			arrow = this.drawer.polyline(points).fill("none").stroke("black");
+			arrow = this.drawer.polyline(points).fill("none").stroke(edge.color);
 		} else {
-			arrow = this.drawer.line(box.left(), box.top(), box.right(), box.bottom()).stroke("black");
+			arrow = this.drawer.line(box.left(), box.top(), box.right(), box.bottom()).stroke(edge.color);
 		}
 
 		if (edge.style === "dashed") {
 			arrow.stroke({ dasharray: "2" });
 		}
 
-		const marker = edge.asynchronous ? this.arrowheads["async"] : this.arrowheads["sync"];
+		const marker = this.render_arrowheads(edge.asynchronous, edge.color);
 		if (edge.direction === "forward") {
 			arrow.marker("end", marker);
 		} else {
@@ -89,8 +85,8 @@ export class DiagramRenderer {
 		if (edge.failed) {
 			const x = edge.is_self_referenced() ? box.center().x - 16 : box.right() + 16;
 			const y = box.bottom();
-			this.drawer.line(x - 8, y - 8, x + 8, y + 8).stroke("black");
-			this.drawer.line(x - 8, y + 8, x + 8, y - 8).stroke("black");
+			this.drawer.line(x - 8, y - 8, x + 8, y + 8).stroke(edge.color);
+			this.drawer.line(x - 8, y + 8, x + 8, y - 8).stroke(edge.color);
 		}
 	}
 

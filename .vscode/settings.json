@@ -3,5 +3,6 @@
         "bbox",
         "seqdiag",
         "svgdotjs"
-    ]
+    ],
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

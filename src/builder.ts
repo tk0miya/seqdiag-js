@@ -112,6 +112,7 @@ export class Edge extends Configurable {
 	to: Node;
 
 	asynchronous: boolean;
+	color = "black";
 	diagonal = false;
 	direction: "forward" | "back";
 	failed = false;
@@ -120,6 +121,9 @@ export class Edge extends Configurable {
 	booleanFields: { [key: string]: keyof Edge } = {
 		diagonal: "diagonal",
 		failed: "failed",
+	};
+	stringFields: { [key: string]: keyof Edge } = {
+		color: "color",
 	};
 
 	constructor(diagram: Diagram, from: Node, op: string, to: Node) {
@@ -204,6 +208,7 @@ class DiagramBuilder {
 
 		if (op === "=>") {
 			edge = new Edge(this.diagram, from, "<-", to);
+			edge.setAttributes(stmt.options);
 			edge.style = "dashed";
 			this.diagram.edges.push(edge);
 		}

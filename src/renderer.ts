@@ -102,12 +102,14 @@ export class DiagramRenderer {
 
 	private render_lifeline(node: Node) {
 		const box = this.metrics.lifeline(node);
-		this.drawer.line(box.left(), box.top(), box.right(), box.bottom()).stroke({ color: "black", dasharray: "8,4" });
+		this.drawer
+			.line(box.left(), box.top(), box.right(), box.bottom())
+			.stroke({ color: this.diagram.defaultLineColor, dasharray: "8,4" });
 	}
 
 	private render_node(node: Node) {
 		const box = this.metrics.node(node);
-		this.drawer.rect(box.width, box.height).fill("white").stroke("black").move(box.left(), box.top());
+		this.drawer.rect(box.width, box.height).fill(node.color).stroke(node.lineColor).move(box.left(), box.top());
 
 		const text = this.textSize(node.label);
 		const x = box.left() + box.width / 2 - text.width / 2;

@@ -1,4 +1,5 @@
 import { Diagram, Node, Edge } from "./builder";
+import { DiagramRenderer } from "./renderer";
 
 export class Size {
 	height: number;
@@ -52,10 +53,12 @@ export class Box extends Size {
 export class Metrics {
 	diagram: Diagram;
 	heights: number[];
+	renderer: DiagramRenderer;
 	widths: number[];
 
-	constructor(diagram: Diagram) {
+	constructor(diagram: Diagram, renderer: DiagramRenderer) {
 		this.diagram = diagram;
+		this.renderer = renderer;
 		this.widths = [];
 		this.heights = [];
 
@@ -106,6 +109,10 @@ export class Metrics {
 
 	edge(edge: Edge): Box {
 		const index = this.diagram.edges.indexOf(edge);
+		let textHeight = 0;
+		if (edge.label) {
+			textHeight = this.textSize(edge.label).height;
+		}
 
 		if (edge.is_self_referenced()) {
 			const i = this.diagram.nodes.indexOf(edge.from);
@@ -116,7 +123,7 @@ export class Metrics {
 			const width = node.width / 2 + this.widths[i * 2] / 2;
 			const height = this.diagram.nodeHeight;
 
-			return new Box(x, y, width, height);
+			return new Box(x, y, width, height + textHeight);
 		} else {
 			const nodes = [this.node(edge.from), this.node(edge.to)];
 			nodes.sort((a, b) => a.left() - b.left());
@@ -127,7 +134,11 @@ export class Metrics {
 			const width = edge.failed ? (x2 - x1) / 2 : x2 - x1;
 			const height = edge.diagonal ? (this.diagram.nodeHeight * 3) / 4 : 0;
 
-			return new Box(x1, y, width, height);
+			return new Box(x1, y, width, height + textHeight);
 		}
+	}
+
+	textSize(s: string): Size {
+		return this.renderer.textSize(s);
 	}
 }

@@ -17,7 +17,7 @@ export class DiagramRenderer {
 		this.diagram = diagram;
 		this.element = element;
 		this.drawer = SVG();
-		this.metrics = new Metrics(diagram);
+		this.metrics = new Metrics(diagram, this);
 	}
 
 	render() {
@@ -55,10 +55,20 @@ export class DiagramRenderer {
 
 	private render_edge(edge: Edge) {
 		const box = this.metrics.edge(edge);
-		let arrow;
+		let top = box.top();
+		if (edge.label) {
+			const textSize = this.textSize(edge.label);
+			if (edge.direction === "forward") {
+				this.drawer.text(edge.label).move(box.left() + 4, top);
+			} else {
+				this.drawer.text(edge.label).move(box.right() - textSize.width - 4, top);
+			}
+			top += textSize.height;
+		}
 
+		let arrow;
 		if (edge.is_self_referenced()) {
-			const points = [box.left(), box.top(), box.right(), box.top(), box.right(), box.bottom()];
+			const points = [box.left(), top, box.right(), top, box.right(), box.bottom()];
 			if (edge.failed) {
 				points.push(box.center().x);
 				points.push(box.bottom());
@@ -68,7 +78,7 @@ export class DiagramRenderer {
 			}
 			arrow = this.drawer.polyline(points).fill("none").stroke(edge.color);
 		} else {
-			arrow = this.drawer.line(box.left(), box.top(), box.right(), box.bottom()).stroke(edge.color);
+			arrow = this.drawer.line(box.left(), top, box.right(), box.bottom()).stroke(edge.color);
 		}
 
 		if (edge.style === "dashed") {
@@ -105,7 +115,7 @@ export class DiagramRenderer {
 		this.drawer.text(node.label).move(x, y);
 	}
 
-	private textSize(s: string): Size {
+	textSize(s: string): Size {
 		const text = this.drawer.text(s);
 		const bbox = text.bbox();
 		text.remove();

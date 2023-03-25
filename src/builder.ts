@@ -86,6 +86,7 @@ export class Node extends Configurable {
 	label: string;
 
 	height: number;
+	lineColor = "black";
 	width: number;
 
 	integerFields: { [key: string]: keyof Node } = {
@@ -94,6 +95,7 @@ export class Node extends Configurable {
 	};
 	stringFields: { [key: string]: keyof Node } = {
 		label: "label",
+		linecolor: "lineColor",
 	};
 
 	constructor(diagram: Diagram, node_id: string) {

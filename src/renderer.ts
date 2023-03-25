@@ -25,19 +25,19 @@ export class DiagramRenderer {
 		this.drawer.size(size.width, size.height);
 
 		this.diagram.nodes.forEach((node) => {
-			this.render_node(node);
-			this.render_lifeline(node);
+			this.renderNode(node);
+			this.renderLifeline(node);
 		});
 
 		this.diagram.edges.forEach((edge) => {
-			this.render_edge(edge);
+			this.renderEdge(edge);
 		});
 
 		this.element.id ||= generateElementId();
 		this.drawer.addTo(`#${this.element.id}`);
 	}
 
-	private render_arrowheads(asynchronous: boolean, color: string): Marker {
+	private renderArrowheads(asynchronous: boolean, color: string): Marker {
 		let callback;
 		if (asynchronous) {
 			callback = (marker: Marker) => {
@@ -53,7 +53,7 @@ export class DiagramRenderer {
 		return this.drawer.marker(10, 10, callback).ref(10, 5).orient("auto-start-reverse");
 	}
 
-	private render_edge(edge: Edge) {
+	private renderEdge(edge: Edge) {
 		const box = this.metrics.edge(edge);
 		let top = box.top();
 		if (edge.label) {
@@ -67,7 +67,7 @@ export class DiagramRenderer {
 		}
 
 		let arrow;
-		if (edge.is_self_referenced()) {
+		if (edge.isSelfReferenced()) {
 			const points = [box.left(), top, box.right(), top, box.right(), box.bottom()];
 			if (edge.failed) {
 				points.push(box.center().x);
@@ -85,7 +85,7 @@ export class DiagramRenderer {
 			arrow.stroke({ dasharray: "2" });
 		}
 
-		const marker = this.render_arrowheads(edge.asynchronous, edge.color);
+		const marker = this.renderArrowheads(edge.asynchronous, edge.color);
 		if (edge.direction === "forward") {
 			arrow.marker("end", marker);
 		} else {
@@ -93,21 +93,21 @@ export class DiagramRenderer {
 		}
 
 		if (edge.failed) {
-			const x = edge.is_self_referenced() ? box.center().x - 16 : box.right() + 16;
+			const x = edge.isSelfReferenced() ? box.center().x - 16 : box.right() + 16;
 			const y = box.bottom();
 			this.drawer.line(x - 8, y - 8, x + 8, y + 8).stroke(edge.color);
 			this.drawer.line(x - 8, y + 8, x + 8, y - 8).stroke(edge.color);
 		}
 	}
 
-	private render_lifeline(node: Node) {
+	private renderLifeline(node: Node) {
 		const box = this.metrics.lifeline(node);
 		this.drawer
 			.line(box.left(), box.top(), box.right(), box.bottom())
 			.stroke({ color: this.diagram.defaultLineColor, dasharray: "8,4" });
 	}
 
-	private render_node(node: Node) {
+	private renderNode(node: Node) {
 		const box = this.metrics.node(node);
 		this.drawer.rect(box.width, box.height).fill(node.color).stroke(node.lineColor).move(box.left(), box.top());
 

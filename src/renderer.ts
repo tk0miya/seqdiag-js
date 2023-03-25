@@ -107,7 +107,7 @@ export class DiagramRenderer {
 
 	private render_node(node: Node) {
 		const box = this.metrics.node(node);
-		this.drawer.rect(box.width, box.height).fill("white").stroke(node.lineColor).move(box.left(), box.top());
+		this.drawer.rect(box.width, box.height).fill(node.color).stroke(node.lineColor).move(box.left(), box.top());
 
 		const text = this.textSize(node.label);
 		const x = box.left() + box.width / 2 - text.width / 2;

@@ -85,6 +85,7 @@ export class Node extends Configurable {
 	id: string;
 	label: string;
 
+	color = "white";
 	height: number;
 	lineColor = "black";
 	width: number;
@@ -94,6 +95,7 @@ export class Node extends Configurable {
 		width: "width",
 	};
 	stringFields: { [key: string]: keyof Node } = {
+		color: "color",
 		label: "label",
 		linecolor: "lineColor",
 	};

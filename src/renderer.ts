@@ -86,7 +86,8 @@ export class DiagramRenderer {
 		}
 
 		const marker = this.renderArrowheads(edge.asynchronous, edge.color);
-		if (edge.direction === "forward") {
+		const leftToRight = this.diagram.nodes.indexOf(edge.from) <= this.diagram.nodes.indexOf(edge.to);
+		if (leftToRight) {
 			arrow.marker("end", marker);
 		} else {
 			arrow.marker("start", marker);

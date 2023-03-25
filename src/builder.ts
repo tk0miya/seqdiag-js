@@ -63,6 +63,7 @@ export class Diagram extends Configurable {
 	nodes: Node[];
 
 	defaultLineColor = "black";
+	defaultNodeColor = "white";
 	nodeHeight = 40;
 	nodeWidth = 120;
 	spanHeight = 20;
@@ -76,6 +77,7 @@ export class Diagram extends Configurable {
 	};
 	stringFields: { [key: string]: keyof Diagram } = {
 		default_linecolor: "defaultLineColor",
+		default_node_color: "defaultNodeColor",
 	};
 
 	constructor() {
@@ -89,7 +91,7 @@ export class Node extends Configurable {
 	id: string;
 	label: string;
 
-	color = "white";
+	color: string;
 	height: number;
 	lineColor: string;
 	width: number;
@@ -109,6 +111,7 @@ export class Node extends Configurable {
 		this.id = node_id;
 		this.label = node_id;
 
+		this.color = diagram.defaultNodeColor;
 		this.height = diagram.nodeHeight;
 		this.lineColor = diagram.defaultLineColor;
 		this.width = diagram.nodeWidth;

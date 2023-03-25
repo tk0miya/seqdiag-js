@@ -1,4 +1,4 @@
-import { Diagram, Node, Edge } from "./builder";
+import { Diagram, Node, Edge, ActivationBar } from "./builder";
 import { DiagramRenderer } from "./renderer";
 
 export class Size {
@@ -119,23 +119,39 @@ export class Metrics {
 
 			const node = this.node(edge.from);
 			const x = node.center().x;
+			const dx = this.diagram.activationDepths[edge.from.id][index] * 4;
 			const y = this.heights.slice(0, index * 2 + 3).reduce((a, b) => a + b, 0);
 			const width = node.width / 2 + this.widths[i * 2] / 2;
 			const height = this.diagram.nodeHeight;
 
-			return new Box(x, y, width, height + textHeight);
+			return new Box(x + dx, y, width - dx, height + textHeight);
 		} else {
-			const nodes = [this.node(edge.from), this.node(edge.to)];
-			nodes.sort((a, b) => a.left() - b.left());
+			const nodes = [edge.from, edge.to];
+			nodes.sort((a, b) => this.diagram.nodes.indexOf(a) - this.diagram.nodes.indexOf(b));
+			const boxes = nodes.map((node) => this.node(node));
 
-			const x1 = nodes[0].center().x;
-			const x2 = nodes[1].center().x;
+			const x1 = boxes[0].center().x;
+			const dx1 = this.diagram.activationDepths[nodes[0].id][index] * 4;
+			const x2 = boxes[1].center().x;
+			const dx2 = (this.diagram.activationDepths[nodes[1].id][index] - 2) * 4;
 			const y = this.heights.slice(0, index * 2 + 3).reduce((a, b) => a + b, 0);
-			const width = edge.failed ? (x2 - x1) / 2 : x2 - x1;
+			const width = edge.failed ? (x2 - x1) / 2 - dx1 * 2 : x2 - x1 - dx1 + dx2;
 			const height = edge.diagonal ? (this.diagram.nodeHeight * 3) / 4 : 0;
 
-			return new Box(x1, y, width, height + textHeight);
+			return new Box(x1 + dx1, y, width, height + textHeight);
 		}
+	}
+
+	activationBar(bar: ActivationBar): Box {
+		const node = this.node(bar.node);
+		const from = this.edge(bar.from);
+		const to = this.edge(bar.to!);
+
+		const x = node.center().x + (bar.depth - 1) * 4 - 4;
+		const y1 = bar.from.diagonal ? from.bottom() : from.top();
+		const y2 = bar.to!.diagonal ? to.top() : to.bottom();
+
+		return new Box(x, y1, 8, y2 - y1);
 	}
 
 	textSize(s: string): Size {

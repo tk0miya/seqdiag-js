@@ -1,4 +1,4 @@
-import { Diagram, Edge, Node } from "./builder";
+import { Diagram, Edge, Node, ActivationBar } from "./builder";
 import { Metrics, Size } from "./metrics";
 import { Marker, SVG, Svg } from "@svgdotjs/svg.js";
 
@@ -27,6 +27,10 @@ export class DiagramRenderer {
 		this.diagram.nodes.forEach((node) => {
 			this.renderNode(node);
 			this.renderLifeline(node);
+		});
+
+		this.diagram.activationBars.forEach((bar) => {
+			this.renderActivationBar(bar);
 		});
 
 		this.diagram.edges.forEach((edge) => {
@@ -115,6 +119,15 @@ export class DiagramRenderer {
 		const x = box.left() + box.width / 2 - text.width / 2;
 		const y = box.top() + box.height / 2 - text.height / 2;
 		this.drawer.text(node.label).move(x, y);
+	}
+
+	private renderActivationBar(bar: ActivationBar) {
+		const box = this.metrics.activationBar(bar);
+		this.drawer
+			.rect(box.width, box.height)
+			.fill("moccasin")
+			.stroke(this.diagram.defaultLineColor)
+			.move(box.left(), box.top());
 	}
 
 	textSize(s: string): Size {

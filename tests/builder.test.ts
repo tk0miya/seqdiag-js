@@ -75,7 +75,7 @@ describe("buildDiagram()", () => {
 				to: { id: "F" },
 				asynchronous: false,
 				direction: "back",
-				style: "solid",
+				style: "dashed",
 			});
 			expect(diagram.edges[5]).toMatchObject({
 				from: { id: "D" },
@@ -83,7 +83,7 @@ describe("buildDiagram()", () => {
 				to: { id: "E" },
 				asynchronous: false,
 				direction: "back",
-				style: "solid",
+				style: "dashed",
 			});
 			expect(diagram.nodes.length).toBe(6);
 			expect(diagram.nodes[0]).toMatchObject({ id: "A", label: "A" });

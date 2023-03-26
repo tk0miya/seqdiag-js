@@ -61,8 +61,8 @@ export class DiagramRenderer {
 		const box = this.metrics.edge(edge);
 		let top = box.top();
 		if (edge.label) {
-			const textSize = this.textSize(edge.label, edge.fontSize);
-			const text = this.drawer.text(edge.label).stroke(edge.textColor).font({ size: edge.fontSize });
+			const textSize = this.textSize(edge.label, edge.fontFamily, edge.fontSize);
+			const text = this.drawer.text(edge.label).stroke(edge.textColor).font({ family: edge.fontFamily, size: edge.fontSize });
 			if (edge.direction === "forward") {
 				text.move(box.left() + 4, top);
 			} else {
@@ -117,10 +117,10 @@ export class DiagramRenderer {
 		const box = this.metrics.node(node);
 		this.drawer.rect(box.width, box.height).fill(node.color).stroke(node.lineColor).move(box.left(), box.top());
 
-		const text = this.textSize(node.label, node.fontSize);
+		const text = this.textSize(node.label, node.fontFamily, node.fontSize);
 		const x = box.left() + box.width / 2 - text.width / 2;
 		const y = box.top() + box.height / 2 - text.height / 2;
-		this.drawer.text(node.label).stroke(node.textColor).font({ size: node.fontSize }).move(x, y);
+		this.drawer.text(node.label).stroke(node.textColor).font({ family: node.fontFamily, size: node.fontSize }).move(x, y);
 	}
 
 	private renderActivationBar(bar: ActivationBar) {
@@ -132,8 +132,8 @@ export class DiagramRenderer {
 			.move(box.left(), box.top());
 	}
 
-	textSize(s: string, size: number): Size {
-		const text = this.drawer.text(s).font({ size });
+	textSize(s: string, family: string | undefined, size: number): Size {
+		const text = this.drawer.text(s).font({ family, size });
 		const bbox = text.bbox();
 		text.remove();
 		return new Size(bbox.width, bbox.height);

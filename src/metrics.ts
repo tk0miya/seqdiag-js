@@ -111,7 +111,7 @@ export class Metrics {
 		const index = this.diagram.edges.indexOf(edge);
 		let textHeight = 0;
 		if (edge.label) {
-			textHeight = this.textSize(edge.label, edge.fontSize).height;
+			textHeight = this.textSize(edge.label, edge.fontFamily, edge.fontSize).height;
 		}
 
 		if (edge.isSelfReferenced()) {
@@ -154,7 +154,7 @@ export class Metrics {
 		return new Box(x, y1, 8, y2 - y1);
 	}
 
-	textSize(s: string, size: number): Size {
-		return this.renderer.textSize(s, size);
+	textSize(s: string, family: string | undefined, size: number): Size {
+		return this.renderer.textSize(s, family, size);
 	}
 }

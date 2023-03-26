@@ -105,6 +105,27 @@ describe("buildDiagram()", () => {
 			expect(diagram.nodes[1]).toMatchObject({ id: "B", label: "B" });
 		});
 
+		it("can build a diagram having complicated edge definitions", () => {
+			const ast = parse(`seqdiag {
+								 A -> B;
+								 B -> A;
+								 A <- B;
+								 B <- A;
+								 A -> A;
+							   }`);
+			const diagram = buildDiagram(ast);
+			assert(diagram !== undefined);
+			expect(diagram.edges.length).toBe(5);
+			expect(diagram.edges[0].arrowDirection()).toBe("right");
+			expect(diagram.edges[1].arrowDirection()).toBe("left");
+			expect(diagram.edges[2].arrowDirection()).toBe("left");
+			expect(diagram.edges[3].arrowDirection()).toBe("right");
+			expect(diagram.edges[4].arrowDirection()).toBe("self");
+			expect(diagram.nodes.length).toBe(2);
+			expect(diagram.nodes[0]).toMatchObject({ id: "A", label: "A" });
+			expect(diagram.nodes[1]).toMatchObject({ id: "B", label: "B" });
+		});
+
 		it("can assign attributes to the diagram", () => {
 			const ast = parse(`seqdiag {
 								 node_height = 123;

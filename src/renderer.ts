@@ -62,7 +62,7 @@ export class DiagramRenderer {
 		let top = box.top();
 		if (edge.label) {
 			const textSize = this.textSize(edge.label);
-			if (edge.direction === "forward") {
+			if (edge.arrowDirection() === "right" || edge.arrowDirection() === "self") {
 				this.drawer
 					.text(edge.label)
 					.stroke(edge.textColor)
@@ -96,8 +96,7 @@ export class DiagramRenderer {
 		}
 
 		const marker = this.renderArrowheads(edge.asynchronous, edge.color);
-		const leftToRight = this.diagram.nodes.indexOf(edge.from) <= this.diagram.nodes.indexOf(edge.to);
-		if (leftToRight) {
+		if (edge.arrowDirection() === "right" || edge.arrowDirection() === "self") {
 			arrow.marker("end", marker);
 		} else {
 			arrow.marker("start", marker);

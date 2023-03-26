@@ -1,6 +1,7 @@
 import { Diagram, Edge, Node, ActivationBar } from "./builder";
 import { Metrics, Size } from "./metrics";
-import { Marker, SVG, Svg } from "@svgdotjs/svg.js";
+import "@svgdotjs/svg.filter.js/src/svg.filter.js";
+import { Element as SVGElement, Marker, SVG, Svg } from "@svgdotjs/svg.js";
 
 // https://stackoverflow.com/a/8084248
 function generateElementId() {
@@ -41,6 +42,14 @@ export class DiagramRenderer {
 		this.drawer.addTo(`#${this.element.id}`);
 	}
 
+	private dropShadow(e: SVGElement) {
+		// @ts-ignore
+		e.filterWith(function (add) {
+			var blur = add.offset(2, 2).in(add.$sourceAlpha).gaussianBlur(2);
+			add.blend(add.$source, blur);
+		});
+	}
+
 	private renderArrowheads(asynchronous: boolean, color: string): Marker {
 		let callback;
 		if (asynchronous) {
@@ -61,17 +70,12 @@ export class DiagramRenderer {
 		const box = this.metrics.edge(edge);
 		let top = box.top();
 		if (edge.label) {
-			const textSize = this.textSize(edge.label);
+			const textSize = this.textSize(edge.label, edge.fontFamily, edge.fontSize);
+			const text = this.drawer.text(edge.label).stroke(edge.textColor).font({ family: edge.fontFamily, size: edge.fontSize });
 			if (edge.arrowDirection() === "right" || edge.arrowDirection() === "self") {
-				this.drawer
-					.text(edge.label)
-					.stroke(edge.textColor)
-					.move(box.left() + 4, top);
+				text.move(box.left() + 4, top);
 			} else {
-				this.drawer
-					.text(edge.label)
-					.stroke(edge.textColor)
-					.move(box.right() - textSize.width - 4, top);
+				text.move(box.right() - textSize.width - 4, top);
 			}
 			top += textSize.height;
 		}
@@ -117,25 +121,32 @@ export class DiagramRenderer {
 
 	private renderNode(node: Node) {
 		const box = this.metrics.node(node);
-		this.drawer.rect(box.width, box.height).fill(node.color).stroke(node.lineColor).move(box.left(), box.top());
+		const rect = this.drawer
+			.rect(box.width, box.height)
+			.fill(node.color)
+			.stroke(node.lineColor)
+			.move(box.left(), box.top());
 
-		const text = this.textSize(node.label);
+		this.dropShadow(rect);
+
+		const text = this.textSize(node.label, node.fontFamily, node.fontSize);
 		const x = box.left() + box.width / 2 - text.width / 2;
 		const y = box.top() + box.height / 2 - text.height / 2;
-		this.drawer.text(node.label).stroke(node.textColor).move(x, y);
+		this.drawer.text(node.label).stroke(node.textColor).font({ family: node.fontFamily, size: node.fontSize }).move(x, y);
 	}
 
 	private renderActivationBar(bar: ActivationBar) {
 		const box = this.metrics.activationBar(bar);
-		this.drawer
+		const rect = this.drawer
 			.rect(box.width, box.height)
 			.fill("moccasin")
 			.stroke(this.diagram.defaultLineColor)
 			.move(box.left(), box.top());
+		this.dropShadow(rect);
 	}
 
-	textSize(s: string): Size {
-		const text = this.drawer.text(s);
+	textSize(s: string, family: string | undefined, size: number): Size {
+		const text = this.drawer.text(s).font({ family, size });
 		const bbox = text.bbox();
 		text.remove();
 		return new Size(bbox.width, bbox.height);

@@ -64,6 +64,8 @@ export class Diagram extends Configurable {
 	edges: Edge[];
 	nodes: Node[];
 
+	defaultFontFamily?: string;
+	defaultFontSize = 11;
 	defaultLineColor = "black";
 	defaultNodeColor = "white";
 	defaultTextColor = "black";
@@ -73,12 +75,14 @@ export class Diagram extends Configurable {
 	spanWidth = 60;
 
 	integerFields: { [key: string]: keyof Diagram } = {
+		default_fontsize: "defaultFontSize",
 		node_height: "nodeHeight",
 		node_width: "nodeWidth",
 		span_height: "spanHeight",
 		span_width: "spanWidth",
 	};
 	stringFields: { [key: string]: keyof Diagram } = {
+		default_fontfamily: "defaultFontFamily",
 		default_linecolor: "defaultLineColor",
 		default_node_color: "defaultNodeColor",
 		default_textcolor: "defaultTextColor",
@@ -98,17 +102,21 @@ export class Node extends Configurable {
 	label: string;
 
 	color: string;
+	fontFamily?: string;
+	fontSize: number;
 	height: number;
 	lineColor: string;
 	textColor: string;
 	width: number;
 
 	integerFields: { [key: string]: keyof Node } = {
+		fontsize: "fontSize",
 		height: "height",
 		width: "width",
 	};
 	stringFields: { [key: string]: keyof Node } = {
 		color: "color",
+		fontfamily: 'fontFamily',
 		label: "label",
 		linecolor: "lineColor",
 		textcolor: "textColor",
@@ -120,6 +128,8 @@ export class Node extends Configurable {
 		this.label = node_id;
 
 		this.color = diagram.defaultNodeColor;
+		this.fontFamily = diagram.defaultFontFamily;
+		this.fontSize = diagram.defaultFontSize;
 		this.height = diagram.nodeHeight;
 		this.lineColor = diagram.defaultLineColor;
 		this.textColor = diagram.defaultTextColor;
@@ -137,6 +147,8 @@ export class Edge extends Configurable {
 	diagonal = false;
 	direction: "forward" | "back";
 	failed = false;
+	fontFamily?: string;
+	fontSize: number;
 	label = "";
 	return = "";
 	style: "solid" | "dashed";
@@ -146,8 +158,12 @@ export class Edge extends Configurable {
 		diagonal: "diagonal",
 		failed: "failed",
 	};
+	integerFields: { [key: string]: keyof Edge } = {
+		fontsize: "fontSize",
+	};
 	stringFields: { [key: string]: keyof Edge } = {
 		color: "color",
+		fontfamily: 'fontFamily',
 		label: "label",
 		return: "return",
 		textcolor: "textColor",
@@ -162,6 +178,8 @@ export class Edge extends Configurable {
 		this.asynchronous = op.startsWith("<<") || op.endsWith(">>");
 		this.color = diagram.defaultLineColor;
 		this.direction = op.endsWith(">") ? "forward" : "back";
+		this.fontFamily = diagram.defaultFontFamily;
+		this.fontSize = diagram.defaultFontSize;
 		this.style = op.includes("--") ? "dashed" : "solid";
 		this.textColor = diagram.defaultTextColor;
 	}

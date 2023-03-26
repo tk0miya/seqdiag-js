@@ -112,6 +112,6 @@ String := literal='"""(.|\r\n)*?"""'
 Number := literal='-?(\.[0-9]+)|([0-9]+(\.[0-9]*)?)'
           .value = number { return parseInt(this.literal) }
 identifier := '[A-Za-z_0-9\u0080-\uFFFF][A-Za-z_\-.0-9\u0080-\uFFFF]*'
-SingleLineComment := '//.*?[\r\n]'
+SingleLineComment := '(//|#).*?[\r\n]'
 MultiLineComment := '/\*.*?\*\/'
 

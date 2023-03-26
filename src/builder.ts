@@ -82,8 +82,8 @@ export class Diagram extends Configurable {
 	activation = true;
 	activationBars: ActivationBar[];
 	activationDepths: { [key: string]: number[] };
-	edges: Edge[];
 	groups: Group[];
+	messages: Message[];
 	nodes: Node[];
 
 	defaultFontFamily?: string;
@@ -117,8 +117,8 @@ export class Diagram extends Configurable {
 		super();
 		this.activationBars = [];
 		this.activationDepths = {};
-		this.edges = [];
 		this.groups = [];
+		this.messages = [];
 		this.nodes = [];
 	}
 }
@@ -243,11 +243,11 @@ export class Edge extends Configurable {
 
 export class ActivationBar {
 	node: Node;
-	from: Edge;
-	to: Edge;
+	from: Message;
+	to: Message;
 	depth: number;
 
-	constructor(node: Node, from: Edge, to: Edge, depth: number) {
+	constructor(node: Node, from: Message, to: Message, depth: number) {
 		this.node = node;
 		this.from = from;
 		this.to = to;
@@ -278,6 +278,18 @@ export class Group extends Configurable {
 	}
 }
 
+export class Separator {
+	label: string;
+	type: "delayed" | "divider";
+
+	constructor(label: string, op: string) {
+		this.label = label;
+		this.type = op === "===" ? "divider" : "delayed";
+	}
+}
+
+export type Message = Edge | Separator;
+
 class DiagramBuilder {
 	diagram: Diagram;
 
@@ -303,6 +315,10 @@ class DiagramBuilder {
 				case ASTKinds.group_stmt:
 					this.buildGroup(stmt);
 					break;
+				case ASTKinds.separator_stmt_1:
+				case ASTKinds.separator_stmt_2:
+					this.buildSeparator(stmt);
+					break;
 			}
 		});
 
@@ -312,13 +328,13 @@ class DiagramBuilder {
 
 	private buildActivationBars() {
 		const depths: { [key: string]: number } = {};
-		const activationBars: [Node, Edge, Edge | undefined, number][] = [];
+		const activationBars: [Node, Message, Message | undefined, number][] = [];
 
-		if (this.diagram.edges.length === 0) {
+		if (this.diagram.messages.length === 0) {
 			return;
 		} else if (this.diagram.activation === false) {
 			this.diagram.nodes.forEach((node) => {
-				this.diagram.activationDepths[node.id] = this.diagram.edges.map(() => 0);
+				this.diagram.activationDepths[node.id] = this.diagram.messages.map(() => 0);
 			});
 			return;
 		}
@@ -327,32 +343,32 @@ class DiagramBuilder {
 			this.diagram.activationDepths[node.id] = [];
 			depths[node.id] = node.activated ? 1 : 0;
 			if (node.activated) {
-				activationBars.push([node, this.diagram.edges[0], undefined, 1]);
+				activationBars.push([node, this.diagram.messages[0], undefined, 1]);
 			}
 		});
 
-		this.diagram.edges.forEach((edge) => {
-			if (edge.isSelfReferenced() || edge.failed || edge.activate === false) {
+		this.diagram.messages.forEach((msg) => {
+			if (msg instanceof Separator || msg.isSelfReferenced() || msg.failed || msg.activate === false) {
 				// No activation bar
 				Object.keys(depths).forEach((nodeId) => {
 					this.diagram.activationDepths[nodeId].push(depths[nodeId]);
 				});
 			} else {
-				if (edge.direction === "forward") {
-					const depth = (depths[edge.to.id] || 0) + 1;
-					activationBars.push([edge.to, edge, undefined, depth]);
-					depths[edge.to.id] = depth;
+				if (msg.direction === "forward") {
+					const depth = (depths[msg.to.id] || 0) + 1;
+					activationBars.push([msg.to, msg, undefined, depth]);
+					depths[msg.to.id] = depth;
 				}
 
 				Object.keys(depths).forEach((nodeId) => {
 					this.diagram.activationDepths[nodeId].push(depths[nodeId]);
 				});
 
-				if (edge.direction === "back") {
-					const activationBar = activationBars.findLast((bar) => bar[0] === edge.to && bar[2] === undefined);
+				if (msg.direction === "back") {
+					const activationBar = activationBars.findLast((bar) => bar[0] === msg.to && bar[2] === undefined);
 					if (activationBar) {
-						activationBar[2] = edge;
-						depths[edge.to.id] -= 1;
+						activationBar[2] = msg;
+						depths[msg.to.id] -= 1;
 					}
 				}
 			}
@@ -360,8 +376,8 @@ class DiagramBuilder {
 
 		activationBars.forEach((bar) => {
 			const [node, from, to, depth] = bar;
-			const to_edge = to || this.diagram.edges.slice(-1)[0];
-			this.diagram.activationBars.push(new ActivationBar(node, from, to_edge, depth));
+			const to_message = to || this.diagram.messages.slice(-1)[0];
+			this.diagram.activationBars.push(new ActivationBar(node, from, to_message, depth));
 		});
 	}
 
@@ -400,7 +416,7 @@ class DiagramBuilder {
 			edge = new Edge(this.diagram, from, op, to);
 		}
 		edge.setAttributes(stmt.options);
-		this.diagram.edges.push(edge);
+		this.diagram.messages.push(edge);
 
 		if (stmt.to.length > index + 1) {
 			this.buildEdgeSub(stmt, to, index + 1);
@@ -411,7 +427,7 @@ class DiagramBuilder {
 			edge.setAttributes(stmt.options);
 			edge.label = edge.return;
 			edge.style = "dashed";
-			this.diagram.edges.push(edge);
+			this.diagram.messages.push(edge);
 		}
 	}
 
@@ -435,6 +451,11 @@ class DiagramBuilder {
 		});
 
 		this.diagram.groups.push(group);
+	}
+
+	private buildSeparator(stmt: parser.separator_stmt) {
+		const separator = new Separator(stmt.label, stmt.type);
+		this.diagram.messages.push(separator);
 	}
 
 	private reorderNodes() {

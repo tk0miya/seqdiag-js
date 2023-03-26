@@ -1,6 +1,6 @@
 import assert from "assert";
 import { parse } from "../src/parser";
-import { buildDiagram } from "../src/builder";
+import { buildDiagram, Edge } from "../src/builder";
 
 describe("buildDiagram()", () => {
 	describe("build a diagram", () => {
@@ -8,7 +8,7 @@ describe("buildDiagram()", () => {
 			const ast = parse("seqdiag {}");
 			const diagram = buildDiagram(ast);
 			assert(diagram !== undefined);
-			expect(diagram.edges.length).toBe(0);
+			expect(diagram.messages.length).toBe(0);
 			expect(diagram.nodes.length).toBe(0);
 		});
 
@@ -16,7 +16,7 @@ describe("buildDiagram()", () => {
 			const ast = parse("seqdiag { A; B; }");
 			const diagram = buildDiagram(ast);
 			assert(diagram !== undefined);
-			expect(diagram.edges.length).toBe(0);
+			expect(diagram.messages.length).toBe(0);
 			expect(diagram.nodes.length).toBe(2);
 			expect(diagram.nodes[0]).toMatchObject({ id: "A", label: "A" });
 			expect(diagram.nodes[1]).toMatchObject({ id: "B", label: "B" });
@@ -26,7 +26,7 @@ describe("buildDiagram()", () => {
 			const ast = parse("seqdiag { A; B; A; }");
 			const diagram = buildDiagram(ast);
 			assert(diagram !== undefined);
-			expect(diagram.edges.length).toBe(0);
+			expect(diagram.messages.length).toBe(0);
 			expect(diagram.nodes.length).toBe(2);
 			expect(diagram.nodes[0]).toMatchObject({ id: "A", label: "A" });
 			expect(diagram.nodes[1]).toMatchObject({ id: "B", label: "B" });
@@ -36,8 +36,8 @@ describe("buildDiagram()", () => {
 			const ast = parse("seqdiag { A --> B ->> C; D => E => F }");
 			const diagram = buildDiagram(ast);
 			assert(diagram !== undefined);
-			expect(diagram.edges.length).toBe(6);
-			expect(diagram.edges[0]).toMatchObject({
+			expect(diagram.messages.length).toBe(6);
+			expect(diagram.messages[0]).toMatchObject({
 				from: { id: "A" },
 				op: "-->",
 				to: { id: "B" },
@@ -45,7 +45,7 @@ describe("buildDiagram()", () => {
 				direction: "forward",
 				style: "dashed",
 			});
-			expect(diagram.edges[1]).toMatchObject({
+			expect(diagram.messages[1]).toMatchObject({
 				from: { id: "B" },
 				op: "->>",
 				to: { id: "C" },
@@ -53,7 +53,7 @@ describe("buildDiagram()", () => {
 				direction: "forward",
 				style: "solid",
 			});
-			expect(diagram.edges[2]).toMatchObject({
+			expect(diagram.messages[2]).toMatchObject({
 				from: { id: "D" },
 				op: "->",
 				to: { id: "E" },
@@ -61,7 +61,7 @@ describe("buildDiagram()", () => {
 				direction: "forward",
 				style: "solid",
 			});
-			expect(diagram.edges[3]).toMatchObject({
+			expect(diagram.messages[3]).toMatchObject({
 				from: { id: "E" },
 				op: "->",
 				to: { id: "F" },
@@ -69,7 +69,7 @@ describe("buildDiagram()", () => {
 				direction: "forward",
 				style: "solid",
 			});
-			expect(diagram.edges[4]).toMatchObject({
+			expect(diagram.messages[4]).toMatchObject({
 				from: { id: "E" },
 				op: "<-",
 				to: { id: "F" },
@@ -77,7 +77,7 @@ describe("buildDiagram()", () => {
 				direction: "back",
 				style: "dashed",
 			});
-			expect(diagram.edges[5]).toMatchObject({
+			expect(diagram.messages[5]).toMatchObject({
 				from: { id: "D" },
 				op: "<-",
 				to: { id: "E" },
@@ -98,8 +98,8 @@ describe("buildDiagram()", () => {
 			const ast = parse("seqdiag { A -> B [diagonal] }");
 			const diagram = buildDiagram(ast);
 			assert(diagram !== undefined);
-			expect(diagram.edges.length).toBe(1);
-			expect(diagram.edges[0]).toMatchObject({ from: { id: "A" }, op: "->", to: { id: "B" }, diagonal: true });
+			expect(diagram.messages.length).toBe(1);
+			expect(diagram.messages[0]).toMatchObject({ from: { id: "A" }, op: "->", to: { id: "B" }, diagonal: true });
 			expect(diagram.nodes.length).toBe(2);
 			expect(diagram.nodes[0]).toMatchObject({ id: "A", label: "A" });
 			expect(diagram.nodes[1]).toMatchObject({ id: "B", label: "B" });
@@ -115,12 +115,13 @@ describe("buildDiagram()", () => {
 							   }`);
 			const diagram = buildDiagram(ast);
 			assert(diagram !== undefined);
-			expect(diagram.edges.length).toBe(5);
-			expect(diagram.edges[0].arrowDirection()).toBe("right");
-			expect(diagram.edges[1].arrowDirection()).toBe("left");
-			expect(diagram.edges[2].arrowDirection()).toBe("left");
-			expect(diagram.edges[3].arrowDirection()).toBe("right");
-			expect(diagram.edges[4].arrowDirection()).toBe("self");
+			expect(diagram.messages.length).toBe(5);
+			const edges = diagram.messages as Edge[];
+			expect(edges[0].arrowDirection()).toBe("right");
+			expect(edges[1].arrowDirection()).toBe("left");
+			expect(edges[2].arrowDirection()).toBe("left");
+			expect(edges[3].arrowDirection()).toBe("right");
+			expect(edges[4].arrowDirection()).toBe("self");
 			expect(diagram.nodes.length).toBe(2);
 			expect(diagram.nodes[0]).toMatchObject({ id: "A", label: "A" });
 			expect(diagram.nodes[1]).toMatchObject({ id: "B", label: "B" });

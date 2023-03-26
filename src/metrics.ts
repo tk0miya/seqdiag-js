@@ -1,4 +1,4 @@
-import { Diagram, Node, Edge, ActivationBar, Group } from "./builder";
+import { Diagram, Node, Edge, ActivationBar, Group, Message, Separator } from "./builder";
 import { DiagramRenderer } from "./renderer";
 
 export class Size {
@@ -90,9 +90,9 @@ export class Metrics {
 		this.heights.push(this.diagram.spanHeight);
 		const nodeHeights = this.diagram.nodes.map((node) => node.height);
 		this.heights.push(Math.max(...nodeHeights));
-		this.diagram.edges.forEach((edge) => {
+		this.diagram.messages.forEach((msg) => {
 			this.heights.push(this.diagram.spanHeight);
-			this.heights.push(this.edge(edge).height);
+			this.heights.push(this.message(msg).height);
 		});
 		this.heights.push(this.diagram.spanHeight);
 		this.heights.push(this.diagram.spanHeight);
@@ -121,7 +121,7 @@ export class Metrics {
 	}
 
 	edge(edge: Edge): Box {
-		const index = this.diagram.edges.indexOf(edge);
+		const index = this.diagram.messages.indexOf(edge);
 		let textHeight = 0;
 		if (edge.label) {
 			textHeight = this.textSize(edge.label, edge.fontFamily, edge.fontSize).height;
@@ -175,23 +175,54 @@ export class Metrics {
 	}
 
 	activationBar(bar: ActivationBar): Box {
-		const textHeight = function (metrics: Metrics, edge: Edge): number {
+		const textHeight = function (metrics: Metrics, edge: Message): number {
 			if (!edge.label) {
 				return 0;
-			} else {
+			} else if (edge instanceof Edge) {
 				return metrics.textSize(edge.label, edge.fontFamily, edge.fontSize).height;
+			} else {
+				return metrics.textSize(edge.label, metrics.diagram.defaultFontFamily, metrics.diagram.defaultFontSize).height;
 			}
 		};
 
 		const node = this.node(bar.node);
-		const from = this.edge(bar.from);
-		const to = this.edge(bar.to);
-
+		const from = this.message(bar.from);
+		const to = this.message(bar.to);
 		const x = node.center().x + (bar.depth - 1) * 4 - 4;
-		const y1 = bar.from.diagonal ? from.bottom() : from.top() + textHeight(this, bar.from);
-		const y2 = bar.to.diagonal ? to.top() + textHeight(this, bar.to) : to.bottom();
+
+		let y1;
+		if (bar.from instanceof Edge) {
+			y1 = bar.from.diagonal ? from.bottom() : from.top() + textHeight(this, bar.from);
+		} else {
+			y1 = from.top();
+		}
+
+		let y2;
+		if (bar.to instanceof Edge) {
+			y2 = bar.to.diagonal ? to.top() + textHeight(this, bar.to) : to.bottom();
+		} else {
+			y2 = to.bottom();
+		}
 
 		return new Box(x, y1, 8, y2 - y1 + this.diagram.spanHeight);
+	}
+
+	message(message: Message): Box {
+		if (message instanceof Edge) {
+			return this.edge(message);
+		} else {
+			return this.separator(message);
+		}
+	}
+
+	separator(separator: Separator): Box {
+		const index = this.diagram.messages.indexOf(separator);
+		const x = this.diagram.spanWidth / 2;
+		const y = this.heights.slice(0, index * 2 + 3).reduce((a, b) => a + b, 0);
+		const text = this.textSize(separator.label, this.diagram.defaultFontFamily, this.diagram.defaultFontSize);
+		const width = this.size().width - this.diagram.spanWidth;
+
+		return new Box(x, y, width, text.height + 8);
 	}
 
 	textSize(s: string, family: string | undefined, size: number): Size {

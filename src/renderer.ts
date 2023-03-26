@@ -72,7 +72,7 @@ export class DiagramRenderer {
 		if (edge.label) {
 			const textSize = this.textSize(edge.label, edge.fontFamily, edge.fontSize);
 			const text = this.drawer.text(edge.label).stroke(edge.textColor).font({ family: edge.fontFamily, size: edge.fontSize });
-			if (edge.direction === "forward") {
+			if (edge.arrowDirection() === "right" || edge.arrowDirection() === "self") {
 				text.move(box.left() + 4, top);
 			} else {
 				text.move(box.right() - textSize.width - 4, top);
@@ -91,8 +91,10 @@ export class DiagramRenderer {
 				points.push(box.bottom());
 			}
 			arrow = this.drawer.polyline(points).fill("none").stroke(edge.color);
-		} else {
+		} else if (edge.arrowDirection() === "right" || edge.arrowDirection() === "self") {
 			arrow = this.drawer.line(box.left(), top, box.right(), box.bottom()).stroke(edge.color);
+		} else {
+			arrow = this.drawer.line(box.right(), top, box.left(), box.bottom()).stroke(edge.color);
 		}
 
 		if (edge.style === "dashed") {
@@ -100,12 +102,7 @@ export class DiagramRenderer {
 		}
 
 		const marker = this.renderArrowheads(edge.asynchronous, edge.color);
-		const leftToRight = this.diagram.nodes.indexOf(edge.from) <= this.diagram.nodes.indexOf(edge.to);
-		if (leftToRight) {
-			arrow.marker("end", marker);
-		} else {
-			arrow.marker("start", marker);
-		}
+		arrow.marker("end", marker);
 
 		if (edge.failed) {
 			const x = edge.isSelfReferenced() ? box.center().x - 16 : box.right() + 16;

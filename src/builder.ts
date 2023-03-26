@@ -141,6 +141,7 @@ export class Edge extends Configurable {
 	from: Node;
 	op: string;
 	to: Node;
+	leftToRight: boolean;
 
 	asynchronous: boolean;
 	color: string;
@@ -174,6 +175,7 @@ export class Edge extends Configurable {
 		this.from = from;
 		this.op = op;
 		this.to = to;
+		this.leftToRight = diagram.nodes.indexOf(from) <= diagram.nodes.indexOf(to);
 
 		this.asynchronous = op.startsWith("<<") || op.endsWith(">>");
 		this.color = diagram.defaultLineColor;
@@ -186,6 +188,16 @@ export class Edge extends Configurable {
 
 	isSelfReferenced(): boolean {
 		return this.from === this.to;
+	}
+
+	arrowDirection(): "right" | "left" | "self" {
+		if (this.isSelfReferenced()) {
+			return "self";
+		} else if ((this.leftToRight && this.direction === "forward") || (!this.leftToRight && this.direction === "back")) {
+			return "right";
+		} else {
+			return "left";
+		}
 	}
 }
 

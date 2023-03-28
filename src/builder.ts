@@ -220,6 +220,7 @@ export class ActivationBar {
 export class Group extends Configurable {
 	nodes: Node[];
 	color = "orange";
+	shape: "box" | "line" = "box";
 
 	stringFields: { [key: string]: keyof Edge } = {
 		color: "color",
@@ -229,6 +230,22 @@ export class Group extends Configurable {
 		super();
 
 		this.nodes = [];
+	}
+
+	setAttribute(name: string, value: string | number | undefined) {
+		if (name === "shape") {
+			this.setShape(name, value);
+		} else {
+			super.setAttribute(name, value);
+		}
+	}
+
+	setShape(name: string, value: string | number | undefined) {
+		if (value === "box" || value === "line") {
+			this.shape = value;
+		} else {
+			console.log(`unknown ${name}: ${value}`);
+		}
 	}
 }
 

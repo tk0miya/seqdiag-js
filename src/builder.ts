@@ -217,10 +217,17 @@ export class ActivationBar {
 	}
 }
 
-export class Group {
+export class Group extends Configurable {
 	nodes: Node[];
+	color = "orange";
+
+	stringFields: { [key: string]: keyof Edge } = {
+		color: "color",
+	};
 
 	constructor() {
+		super();
+
 		this.nodes = [];
 	}
 }
@@ -359,7 +366,7 @@ class DiagramBuilder {
 		stmt.statements.forEach((sub_stmt) => {
 			switch (sub_stmt.kind) {
 				case ASTKinds.attribute_stmt:
-					// TODO
+					group.setAttribute(sub_stmt.name, sub_stmt.value);
 					break;
 				case ASTKinds.node_stmt:
 					const node = this.findOrBuildNode(sub_stmt.name);

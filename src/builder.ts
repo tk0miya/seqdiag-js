@@ -116,7 +116,7 @@ export class Node extends Configurable {
 	};
 	stringFields: { [key: string]: keyof Node } = {
 		color: "color",
-		fontfamily: 'fontFamily',
+		fontfamily: "fontFamily",
 		label: "label",
 		linecolor: "lineColor",
 		textcolor: "textColor",
@@ -164,7 +164,7 @@ export class Edge extends Configurable {
 	};
 	stringFields: { [key: string]: keyof Edge } = {
 		color: "color",
-		fontfamily: 'fontFamily',
+		fontfamily: "fontFamily",
 		label: "label",
 		return: "return",
 		textcolor: "textColor",

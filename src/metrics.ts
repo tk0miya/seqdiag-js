@@ -1,4 +1,4 @@
-import { Diagram, Node, Edge, ActivationBar } from "./builder";
+import { Diagram, Node, Edge, ActivationBar, Group } from "./builder";
 import { DiagramRenderer } from "./renderer";
 
 export class Size {
@@ -140,6 +140,20 @@ export class Metrics {
 
 			return new Box(x1 + dx1, y, width, height + textHeight);
 		}
+	}
+
+	group(group: Group): Box {
+		const indices = group.nodes.map((node) => this.diagram.nodes.indexOf(node));
+		indices.sort((a, b) => a - b);
+		const left = indices[0];
+		const right = indices.splice(-1)[0];
+
+		const x1 = this.widths.slice(0, left * 2 + 1).reduce((a, b) => a + b, 0) - 8;
+		const x2 = this.widths.slice(0, (right + 1) * 2).reduce((a, b) => a + b, 0) + 8;
+		const y1 = this.heights[0] - 8;
+		const y2 = this.heights.reduce((a, b) => a + b, 0) - this.diagram.spanHeight + 8;
+
+		return new Box(x1, y1, x2 - x1, y2 - y1);
 	}
 
 	activationBar(bar: ActivationBar): Box {

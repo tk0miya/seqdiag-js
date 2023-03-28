@@ -62,6 +62,7 @@ export class Diagram extends Configurable {
 	activationBars: ActivationBar[];
 	activationDepths: { [key: string]: number[] };
 	edges: Edge[];
+	groups: Group[];
 	nodes: Node[];
 
 	defaultFontFamily?: string;
@@ -93,6 +94,7 @@ export class Diagram extends Configurable {
 		this.activationBars = [];
 		this.activationDepths = {};
 		this.edges = [];
+		this.groups = [];
 		this.nodes = [];
 	}
 }
@@ -215,6 +217,14 @@ export class ActivationBar {
 	}
 }
 
+export class Group {
+	nodes: Node[];
+
+	constructor() {
+		this.nodes = [];
+	}
+}
+
 class DiagramBuilder {
 	diagram: Diagram;
 
@@ -237,9 +247,13 @@ class DiagramBuilder {
 				case ASTKinds.edge_stmt:
 					this.buildEdge(stmt);
 					break;
+				case ASTKinds.group_stmt:
+					this.buildGroup(stmt);
+					break;
 			}
 		});
 
+		this.reorderNodes();
 		this.buildActivationBars();
 	}
 
@@ -337,6 +351,52 @@ class DiagramBuilder {
 			edge.style = "dashed";
 			this.diagram.edges.push(edge);
 		}
+	}
+
+	private buildGroup(stmt: parser.group_stmt) {
+		const group = new Group();
+
+		stmt.statements.forEach((sub_stmt) => {
+			switch (sub_stmt.kind) {
+				case ASTKinds.attribute_stmt:
+					// TODO
+					break;
+				case ASTKinds.node_stmt:
+					const node = this.findOrBuildNode(sub_stmt.name);
+					if (this.diagram.groups.some((g) => g.nodes.includes(node))) {
+						console.log(`The node ${node.id} has already belong to other group. Ignored.`);
+					} else {
+						group.nodes.push(this.findOrBuildNode(sub_stmt.name));
+					}
+					break;
+			}
+		});
+
+		this.diagram.groups.push(group);
+	}
+
+	private reorderNodes() {
+		const appeared: Node[] = [];
+
+		this.diagram.nodes.concat().forEach((node) => {
+			if (!appeared.includes(node)) {
+				appeared.push(node);
+				const group = this.diagram.groups.find((g) => g.nodes.includes(node));
+				if (group) {
+					let newIndex = this.diagram.nodes.indexOf(node);
+					group.nodes.forEach((group_node) => {
+						if (!appeared.includes(group_node)) {
+							appeared.push(group_node);
+							const oldIndex = this.diagram.nodes.indexOf(group_node);
+							this.diagram.nodes.splice(oldIndex, 1);
+
+							this.diagram.nodes.splice(newIndex + 1, 0, group_node);
+							newIndex += 1;
+						}
+					});
+				}
+			}
+		});
 	}
 }
 

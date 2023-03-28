@@ -221,6 +221,7 @@ export class Group extends Configurable {
 	nodes: Node[];
 	color = "orange";
 	shape: "box" | "line" = "box";
+	style: "solid" | "dashed" = "solid";
 
 	stringFields: { [key: string]: keyof Edge } = {
 		color: "color",
@@ -235,6 +236,8 @@ export class Group extends Configurable {
 	setAttribute(name: string, value: string | number | undefined) {
 		if (name === "shape") {
 			this.setShape(name, value);
+		} else if (name === "style") {
+			this.setStyle(name, value);
 		} else {
 			super.setAttribute(name, value);
 		}
@@ -243,6 +246,14 @@ export class Group extends Configurable {
 	setShape(name: string, value: string | number | undefined) {
 		if (value === "box" || value === "line") {
 			this.shape = value;
+		} else {
+			console.log(`unknown ${name}: ${value}`);
+		}
+	}
+
+	setStyle(name: string, value: string | number | undefined) {
+		if (value === "solid" || value === "dashed") {
+			this.style = value;
 		} else {
 			console.log(`unknown ${name}: ${value}`);
 		}

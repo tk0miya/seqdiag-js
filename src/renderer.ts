@@ -136,7 +136,10 @@ export class DiagramRenderer {
 				.move(box.left(), box.top());
 			this.blur(rect);
 		} else {
-			this.drawer.rect(box.width, box.height).fill("none").stroke(group.color).move(box.left(), box.top());
+			const line = this.drawer.rect(box.width, box.height).fill("none").stroke(group.color).move(box.left(), box.top());
+			if (group.style === "dashed") {
+				line.stroke({ dasharray: "2" });
+			}
 		}
 	}
 

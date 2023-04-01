@@ -5,7 +5,7 @@
 import assert from "assert";
 import { parse } from "../src/parser";
 import { buildDiagram } from "../src/builder";
-import { Metrics, Size } from "../src/metrics";
+import { Box, Metrics, Size } from "../src/metrics";
 import { DiagramRenderer } from "../src/renderer";
 
 describe("Size", () => {
@@ -33,6 +33,40 @@ describe("Size", () => {
 			expect(box.coordinate.y).toBe(y);
 			expect(box.width).toBe(width);
 			expect(box.height).toBe(height);
+		});
+	});
+});
+
+describe("Box", () => {
+	describe("new Box()", () => {
+		it("has coordinate, width and height as properties", () => {
+			const width = 123;
+			const height = 456;
+			const x = 78;
+			const y = 90;
+			const box = new Box(x, y, width, height);
+
+			expect(box.coordinate.x).toBe(x);
+			expect(box.coordinate.y).toBe(y);
+			expect(box.width).toBe(width);
+			expect(box.height).toBe(height);
+		});
+	});
+
+	describe("Box.extend()", () => {
+		it("returns an extended Box", () => {
+			const width = 123;
+			const height = 456;
+			const x = 78;
+			const y = 90;
+			const box = new Box(x, y, width, height);
+
+			const [top, left, right, bottom] = [1, 2, 3, 4];
+			const extended = box.extend({ top, left, right, bottom });
+			expect(extended.coordinate.x).toBe(x - left);
+			expect(extended.coordinate.y).toBe(y - top);
+			expect(extended.width).toBe(width + left + right);
+			expect(extended.height).toBe(height + top + bottom);
 		});
 	});
 });

@@ -52,6 +52,15 @@ export class Box extends Size {
 	center(): Point {
 		return new Point(this.coordinate.x + this.width / 2, this.coordinate.y + this.height / 2);
 	}
+
+	extend({ top, left, right, bottom }: { top?: number; left?: number; right?: number; bottom?: number }): Box {
+		return new Box(
+			this.coordinate.x - (left || 0),
+			this.coordinate.y - (top || 0),
+			this.width + (left || 0) + (right || 0),
+			this.height + (top || 0) + (bottom || 0),
+		);
+	}
 }
 
 export class Metrics {

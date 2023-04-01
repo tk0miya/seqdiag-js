@@ -64,7 +64,7 @@ describe("Metrics", () => {
 			const renderer = new DiagramRenderer(diagram, document.body);
 			const metrics = new Metrics(diagram, renderer);
 			expect(metrics.edge(diagram.edges[0])).toMatchObject({ coordinate: { x: 124, y: 80 }, height: 0, width: 172 });
-			expect(metrics.edge(diagram.edges[1])).toMatchObject({ coordinate: { x: 128, y: 100 }, height: 0, width: 344 });
+			expect(metrics.edge(diagram.edges[1])).toMatchObject({ coordinate: { x: 128, y: 100 }, height: 0, width: 352 });
 		});
 	});
 });

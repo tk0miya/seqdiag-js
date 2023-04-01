@@ -126,14 +126,18 @@ export class Metrics {
 
 			return new Box(x + dx, y, width - dx, height + textHeight);
 		} else {
+			const depths = this.diagram.activationDepths;
 			const nodes = [edge.from, edge.to];
 			nodes.sort((a, b) => this.diagram.nodes.indexOf(a) - this.diagram.nodes.indexOf(b));
 			const boxes = nodes.map((node) => this.node(node));
 
+			const depth1 = this.diagram.activationDepths[nodes[0].id][index];
+			const depth2 = this.diagram.activationDepths[nodes[1].id][index];
+
 			const x1 = boxes[0].center().x;
-			const dx1 = this.diagram.activationDepths[nodes[0].id][index] * 4;
+			const dx1 = depth1 * 4;
 			const x2 = boxes[1].center().x;
-			const dx2 = (this.diagram.activationDepths[nodes[1].id][index] - 2) * 4;
+			const dx2 = depth2 ? (depth2 - 2) * 4 : 0;
 			const y = this.heights.slice(0, index * 2 + 3).reduce((a, b) => a + b, 0);
 			const width = edge.failed ? (x2 - x1) / 2 - dx1 * 2 : x2 - x1 - dx1 + dx2;
 			const height = edge.diagonal ? (this.diagram.nodeHeight * 3) / 4 : 0;

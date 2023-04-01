@@ -141,6 +141,17 @@ export class DiagramRenderer {
 				line.stroke({ dasharray: "2" });
 			}
 		}
+
+		if (group.label) {
+			const text = this.textSize(group.label, this.diagram.defaultFontFamily, this.diagram.defaultFontSize);
+			const x = box.center().x - text.width / 2;
+			const y = box.top() + 4;
+			this.drawer
+				.text(group.label)
+				.stroke(this.diagram.defaultTextColor)
+				.font({ family: this.diagram.defaultFontFamily, size: this.diagram.defaultFontSize })
+				.move(x, y);
+		}
 	}
 
 	private renderLifeline(node: Node) {

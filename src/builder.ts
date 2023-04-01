@@ -240,6 +240,7 @@ export class ActivationBar {
 export class Group extends Configurable {
 	nodes: Node[];
 	color = "orange";
+	label = "";
 	shape: "box" | "line" = "box";
 	style: "solid" | "dashed" = "solid";
 
@@ -249,6 +250,7 @@ export class Group extends Configurable {
 	};
 	stringFields: { [key: string]: keyof Edge } = {
 		color: "color",
+		label: "label",
 	};
 
 	constructor() {

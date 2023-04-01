@@ -40,7 +40,7 @@ class Configurable {
 	}
 
 	setBooleanAttribute<T>(this: T, name: string, value: string | number | undefined, propName: keyof T) {
-		if (value === "false") {
+		if (value === "false" || value === "none") {
 			this[propName] = false as never;
 		} else {
 			this[propName] = true as never;
@@ -79,6 +79,7 @@ class Configurable {
 }
 
 export class Diagram extends Configurable {
+	activation = true;
 	activationBars: ActivationBar[];
 	activationDepths: { [key: string]: number[] };
 	edges: Edge[];
@@ -95,6 +96,9 @@ export class Diagram extends Configurable {
 	spanHeight = 20;
 	spanWidth = 60;
 
+	booleanFields: { [key: string]: keyof Diagram } = {
+		activation: "activation",
+	};
 	integerFields: { [key: string]: keyof Diagram } = {
 		default_fontsize: "defaultFontSize",
 		node_height: "nodeHeight",
@@ -310,6 +314,11 @@ class DiagramBuilder {
 		const depths: { [key: string]: number } = {};
 
 		if (this.diagram.edges.length === 0) {
+			return;
+		} else if (this.diagram.activation === false) {
+			this.diagram.nodes.forEach((node) => {
+				this.diagram.activationDepths[node.id] = this.diagram.edges.map(() => 0);
+			});
 			return;
 		}
 

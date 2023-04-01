@@ -123,6 +123,7 @@ export class Node extends Configurable {
 	id: string;
 	label: string;
 
+	activated = false;
 	color: string;
 	fontFamily?: string;
 	fontSize: number;
@@ -131,6 +132,9 @@ export class Node extends Configurable {
 	textColor: string;
 	width: number;
 
+	booleanFields: { [key: string]: keyof Node } = {
+		activated: "activated",
+	};
 	integerFields: { [key: string]: keyof Node } = {
 		fontsize: "fontSize",
 		height: "height",
@@ -297,10 +301,12 @@ class DiagramBuilder {
 			return;
 		}
 
-		this.diagram.activationBars.push(new ActivationBar(this.diagram.nodes[0], this.diagram.edges[0], undefined, 1));
-		this.diagram.nodes.forEach((node, index) => {
+		this.diagram.nodes.forEach((node) => {
 			this.diagram.activationDepths[node.id] = [];
-			depths[node.id] = index === 0 ? 1 : 0;
+			depths[node.id] = node.activated ? 1 : 0;
+			if (node.activated) {
+				this.diagram.activationBars.push(new ActivationBar(node, this.diagram.edges[0], undefined, 1));
+			}
 		});
 
 		this.diagram.edges.forEach((edge) => {
@@ -350,6 +356,9 @@ class DiagramBuilder {
 			return node;
 		} else {
 			const newNode = new Node(this.diagram, name);
+			if (this.diagram.nodes.length === 0) {
+				newNode.activated = true;
+			}
 			this.diagram.nodes.push(newNode);
 			return newNode;
 		}

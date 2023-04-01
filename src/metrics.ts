@@ -148,9 +148,10 @@ export class Metrics {
 		const left = indices[0];
 		const right = indices.splice(-1)[0];
 
+		const text = this.textSize(group.label, this.diagram.defaultFontFamily, this.diagram.defaultFontSize);
 		const x1 = this.widths.slice(0, left * 2 + 1).reduce((a, b) => a + b, 0) - 8;
 		const x2 = this.widths.slice(0, (right + 1) * 2).reduce((a, b) => a + b, 0) + 8;
-		const y1 = this.heights[0] - 8;
+		const y1 = this.heights[0] - 8 - text.height;
 		const y2 = this.heights.reduce((a, b) => a + b, 0) - this.diagram.spanHeight + 8;
 
 		return new Box(x1, y1, x2 - x1, y2 - y1);

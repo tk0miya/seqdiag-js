@@ -128,12 +128,19 @@ export class DiagramRenderer {
 
 	private renderGroup(group: Group) {
 		const box = this.metrics.group(group);
-		const rect = this.drawer
-			.rect(box.width, box.height)
-			.fill(group.color)
-			.stroke(group.color)
-			.move(box.left(), box.top());
-		this.blur(rect);
+		if (group.shape === "box") {
+			const rect = this.drawer
+				.rect(box.width, box.height)
+				.fill(group.color)
+				.stroke(group.color)
+				.move(box.left(), box.top());
+			this.blur(rect);
+		} else {
+			const line = this.drawer.rect(box.width, box.height).fill("none").stroke(group.color).move(box.left(), box.top());
+			if (group.style === "dashed") {
+				line.stroke({ dasharray: "2" });
+			}
+		}
 	}
 
 	private renderLifeline(node: Node) {

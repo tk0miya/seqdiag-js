@@ -165,6 +165,7 @@ export class Edge extends Configurable {
 	to: Node;
 	leftToRight: boolean;
 
+	activate = true;
 	asynchronous: boolean;
 	color: string;
 	diagonal = false;
@@ -178,6 +179,7 @@ export class Edge extends Configurable {
 	textColor: string;
 
 	booleanFields: { [key: string]: keyof Edge } = {
+		activate: "activate",
 		diagonal: "diagonal",
 		failed: "failed",
 	};
@@ -206,6 +208,14 @@ export class Edge extends Configurable {
 		this.fontSize = diagram.defaultFontSize;
 		this.style = op.includes("--") ? "dashed" : "solid";
 		this.textColor = diagram.defaultTextColor;
+	}
+
+	setAttribute(name: string, value: string | number | undefined) {
+		if (name === "noactivate") {
+			this.activate = false;
+		} else {
+			super.setAttribute(name, value);
+		}
 	}
 
 	isSelfReferenced(): boolean {
@@ -304,7 +314,7 @@ class DiagramBuilder {
 		});
 
 		this.diagram.edges.forEach((edge) => {
-			if (edge.isSelfReferenced() || edge.failed) {
+			if (edge.isSelfReferenced() || edge.failed || edge.activate === false) {
 				// No activation bar
 				Object.keys(depths).forEach((nodeId) => {
 					this.diagram.activationDepths[nodeId].push(depths[nodeId]);

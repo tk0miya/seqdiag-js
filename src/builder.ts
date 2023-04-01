@@ -3,15 +3,18 @@ import { ASTKinds } from "./parser";
 
 interface IConfigurable<T> {
 	booleanFields: { [key: string]: keyof T };
+	enumFields: { [key: string]: [keyof T, string[]] };
 	integerFields: { [key: string]: keyof T };
 	stringFields: { [key: string]: keyof T };
 	setBooleanAttribute(name: string, value: string | number | undefined, propName: keyof T): void;
+	setEnumAttribute(name: string, value: string | number | undefined, propName: keyof T, candidates: string[]): void;
 	setIntegerAttribute(name: string, value: string | number | undefined, propName: keyof T): void;
 	setStringAttribute(name: string, value: string | number | undefined, propName: keyof T): void;
 }
 
 class Configurable {
 	booleanFields: { [key: string]: string } = {};
+	enumFields: { [key: string]: [string, string[]] } = {};
 	integerFields: { [key: string]: string } = {};
 	stringFields: { [key: string]: string } = {};
 
@@ -24,6 +27,9 @@ class Configurable {
 	setAttribute<T>(this: IConfigurable<T>, name: string, value: string | number | undefined) {
 		if (name in this.booleanFields) {
 			this.setBooleanAttribute(name, value, this.booleanFields[name]);
+		} else if (name in this.enumFields) {
+			const [propName, candidates] = this.enumFields[name];
+			this.setEnumAttribute(name, value, propName, candidates);
 		} else if (name in this.integerFields) {
 			this.setIntegerAttribute(name, value, this.integerFields[name]);
 		} else if (name in this.stringFields) {
@@ -38,6 +44,20 @@ class Configurable {
 			this[propName] = false as never;
 		} else {
 			this[propName] = true as never;
+		}
+	}
+
+	setEnumAttribute<T>(
+		this: T,
+		name: string,
+		value: string | number | undefined,
+		propName: keyof T,
+		candidates: string[],
+	) {
+		if (typeof value === "string" && candidates.includes(value)) {
+			this[propName] = value as never;
+		} else {
+			console.log(`unknown ${name}: ${value}`);
 		}
 	}
 
@@ -223,6 +243,10 @@ export class Group extends Configurable {
 	shape: "box" | "line" = "box";
 	style: "solid" | "dashed" = "solid";
 
+	enumFields: { [key: string]: [keyof Group, string[]] } = {
+		shape: ["shape", ["box", "line"]],
+		style: ["style", ["dashed", "solid"]],
+	};
 	stringFields: { [key: string]: keyof Edge } = {
 		color: "color",
 	};
@@ -231,32 +255,6 @@ export class Group extends Configurable {
 		super();
 
 		this.nodes = [];
-	}
-
-	setAttribute(name: string, value: string | number | undefined) {
-		if (name === "shape") {
-			this.setShape(name, value);
-		} else if (name === "style") {
-			this.setStyle(name, value);
-		} else {
-			super.setAttribute(name, value);
-		}
-	}
-
-	setShape(name: string, value: string | number | undefined) {
-		if (value === "box" || value === "line") {
-			this.shape = value;
-		} else {
-			console.log(`unknown ${name}: ${value}`);
-		}
-	}
-
-	setStyle(name: string, value: string | number | undefined) {
-		if (value === "solid" || value === "dashed") {
-			this.style = value;
-		} else {
-			console.log(`unknown ${name}: ${value}`);
-		}
 	}
 }
 

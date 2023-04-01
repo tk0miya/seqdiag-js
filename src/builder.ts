@@ -244,10 +244,10 @@ export class Edge extends Configurable {
 export class ActivationBar {
 	node: Node;
 	from: Edge;
-	to?: Edge;
+	to: Edge;
 	depth: number;
 
-	constructor(node: Node, from: Edge, to: Edge | undefined, depth: number) {
+	constructor(node: Node, from: Edge, to: Edge, depth: number) {
 		this.node = node;
 		this.from = from;
 		this.to = to;
@@ -312,6 +312,7 @@ class DiagramBuilder {
 
 	private buildActivationBars() {
 		const depths: { [key: string]: number } = {};
+		const activationBars: [Node, Edge, Edge | undefined, number][] = [];
 
 		if (this.diagram.edges.length === 0) {
 			return;
@@ -326,7 +327,7 @@ class DiagramBuilder {
 			this.diagram.activationDepths[node.id] = [];
 			depths[node.id] = node.activated ? 1 : 0;
 			if (node.activated) {
-				this.diagram.activationBars.push(new ActivationBar(node, this.diagram.edges[0], undefined, 1));
+				activationBars.push([node, this.diagram.edges[0], undefined, 1]);
 			}
 		});
 
@@ -339,7 +340,7 @@ class DiagramBuilder {
 			} else {
 				if (edge.direction === "forward") {
 					const depth = (depths[edge.to.id] || 0) + 1;
-					this.diagram.activationBars.push(new ActivationBar(edge.to, edge, undefined, depth));
+					activationBars.push([edge.to, edge, undefined, depth]);
 					depths[edge.to.id] = depth;
 				}
 
@@ -348,21 +349,21 @@ class DiagramBuilder {
 				});
 
 				if (edge.direction === "back") {
-					const activationBar = this.diagram.activationBars.findLast((bar) => {
-						return bar.node === edge.to && bar.to === undefined;
+					const activationBar = activationBars.findLast((bar) => {
+						return bar[0] === edge.to && bar[2] === undefined;
 					});
 					if (activationBar) {
-						activationBar.to = edge;
+						activationBar[2] = edge;
 						depths[edge.to.id] -= 1;
 					}
 				}
 			}
 		});
 
-		this.diagram.activationBars.forEach((bar) => {
-			if (bar.to === undefined) {
-				bar.to = this.diagram.edges.slice(-1)[0];
-			}
+		activationBars.forEach((bar) => {
+			const [node, from, to, depth] = bar;
+			const to_edge = to || this.diagram.edges.slice(-1)[0];
+			this.diagram.activationBars.push(new ActivationBar(node, from, to_edge, depth));
 		});
 	}
 

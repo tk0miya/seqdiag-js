@@ -172,11 +172,11 @@ export class Metrics {
 
 		const node = this.node(bar.node);
 		const from = this.edge(bar.from);
-		const to = this.edge(bar.to!);
+		const to = this.edge(bar.to);
 
 		const x = node.center().x + (bar.depth - 1) * 4 - 4;
 		const y1 = bar.from.diagonal ? from.bottom() : from.top() + textHeight(this, bar.from);
-		const y2 = bar.to!.diagonal ? to.top() + textHeight(this, bar.to!) : to.bottom();
+		const y2 = bar.to.diagonal ? to.top() + textHeight(this, bar.to) : to.bottom();
 
 		return new Box(x, y1, 8, y2 - y1);
 	}

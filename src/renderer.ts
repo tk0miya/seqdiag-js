@@ -49,14 +49,14 @@ export class DiagramRenderer {
 	private blur(e: SVGElement) {
 		// @ts-ignore
 		e.filterWith(function (add) {
-			var blur = add.gaussianBlur(2);
+			add.gaussianBlur(2);
 		});
 	}
 
 	private dropShadow(e: SVGElement) {
 		// @ts-ignore
 		e.filterWith(function (add) {
-			var blur = add.offset(2, 2).in(add.$sourceAlpha).gaussianBlur(2);
+			const blur = add.offset(2, 2).in(add.$sourceAlpha).gaussianBlur(2);
 			add.blend(add.$source, blur);
 		});
 	}

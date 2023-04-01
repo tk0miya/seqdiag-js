@@ -71,7 +71,10 @@ export class DiagramRenderer {
 		let top = box.top();
 		if (edge.label) {
 			const textSize = this.textSize(edge.label, edge.fontFamily, edge.fontSize);
-			const text = this.drawer.text(edge.label).stroke(edge.textColor).font({ family: edge.fontFamily, size: edge.fontSize });
+			const text = this.drawer
+				.text(edge.label)
+				.stroke(edge.textColor)
+				.font({ family: edge.fontFamily, size: edge.fontSize });
 			if (edge.arrowDirection() === "right" || edge.arrowDirection() === "self") {
 				text.move(box.left() + 4, top);
 			} else {
@@ -132,7 +135,11 @@ export class DiagramRenderer {
 		const text = this.textSize(node.label, node.fontFamily, node.fontSize);
 		const x = box.left() + box.width / 2 - text.width / 2;
 		const y = box.top() + box.height / 2 - text.height / 2;
-		this.drawer.text(node.label).stroke(node.textColor).font({ family: node.fontFamily, size: node.fontSize }).move(x, y);
+		this.drawer
+			.text(node.label)
+			.stroke(node.textColor)
+			.font({ family: node.fontFamily, size: node.fontSize })
+			.move(x, y);
 	}
 
 	private renderActivationBar(bar: ActivationBar) {

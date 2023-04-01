@@ -5,8 +5,37 @@
 import assert from "assert";
 import { parse } from "../src/parser";
 import { buildDiagram } from "../src/builder";
-import { Metrics } from "../src/metrics";
+import { Metrics, Size } from "../src/metrics";
 import { DiagramRenderer } from "../src/renderer";
+
+describe("Size", () => {
+	describe("new Size()", () => {
+		it("has width and height as properties", () => {
+			const width = 123;
+			const height = 456;
+			const size = new Size(width, height);
+
+			expect(size.width).toBe(width);
+			expect(size.height).toBe(height);
+		});
+	});
+
+	describe("Size.move()", () => {
+		it("returns a Box instance", () => {
+			const width = 123;
+			const height = 456;
+			const size = new Size(width, height);
+
+			const x = 78;
+			const y = 90;
+			const box = size.move(x, y);
+			expect(box.coordinate.x).toBe(x);
+			expect(box.coordinate.y).toBe(y);
+			expect(box.width).toBe(width);
+			expect(box.height).toBe(height);
+		});
+	});
+});
 
 describe("Metrics", () => {
 	describe("Metrics.node()", () => {

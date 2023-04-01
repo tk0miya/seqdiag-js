@@ -9,6 +9,10 @@ export class Size {
 		this.height = height;
 		this.width = width;
 	}
+
+	move(x: number, y: number): Box {
+		return new Box(x, y, this.width, this.height);
+	}
 }
 
 export class Point {

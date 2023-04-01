@@ -1,4 +1,4 @@
-import { Diagram, Edge, Node, ActivationBar } from "./builder";
+import { Diagram, Edge, Node, ActivationBar, Group } from "./builder";
 import { Metrics, Size } from "./metrics";
 import "@svgdotjs/svg.filter.js/src/svg.filter.js";
 import { Element as SVGElement, Marker, SVG, Svg } from "@svgdotjs/svg.js";
@@ -25,6 +25,10 @@ export class DiagramRenderer {
 		const size = this.metrics.size();
 		this.drawer.size(size.width, size.height);
 
+		this.diagram.groups.forEach((group) => {
+			this.renderGroup(group);
+		});
+
 		this.diagram.nodes.forEach((node) => {
 			this.renderNode(node);
 			this.renderLifeline(node);
@@ -40,6 +44,13 @@ export class DiagramRenderer {
 
 		this.element.id ||= generateElementId();
 		this.drawer.addTo(`#${this.element.id}`);
+	}
+
+	private blur(e: SVGElement) {
+		// @ts-ignore
+		e.filterWith(function (add) {
+			var blur = add.gaussianBlur(2);
+		});
 	}
 
 	private dropShadow(e: SVGElement) {
@@ -113,6 +124,12 @@ export class DiagramRenderer {
 			this.drawer.line(x - 8, y - 8, x + 8, y + 8).stroke(edge.color);
 			this.drawer.line(x - 8, y + 8, x + 8, y - 8).stroke(edge.color);
 		}
+	}
+
+	private renderGroup(group: Group) {
+		const box = this.metrics.group(group);
+		const rect = this.drawer.rect(box.width, box.height).fill("orange").stroke("orange").move(box.left(), box.top());
+		this.blur(rect);
 	}
 
 	private renderLifeline(node: Node) {

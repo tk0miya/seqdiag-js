@@ -349,9 +349,7 @@ class DiagramBuilder {
 				});
 
 				if (edge.direction === "back") {
-					const activationBar = activationBars.findLast((bar) => {
-						return bar[0] === edge.to && bar[2] === undefined;
-					});
+					const activationBar = activationBars.findLast((bar) => bar[0] === edge.to && bar[2] === undefined);
 					if (activationBar) {
 						activationBar[2] = edge;
 						depths[edge.to.id] -= 1;

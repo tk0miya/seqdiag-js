@@ -3,6 +3,7 @@
         "bbox",
         "fontfamily",
         "linecolor",
+        "noactivate",
         "seqdiag",
         "svgdotjs",
         "textcolor"

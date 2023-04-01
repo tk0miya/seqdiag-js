@@ -178,7 +178,7 @@ export class Metrics {
 		const y1 = bar.from.diagonal ? from.bottom() : from.top() + textHeight(this, bar.from);
 		const y2 = bar.to!.diagonal ? to.top() + textHeight(this, bar.to!) : to.bottom();
 
-		return new Box(x, y1, 8, y2 - y1);
+		return new Box(x, y1, 8, y2 - y1 + this.diagram.spanHeight);
 	}
 
 	textSize(s: string, family: string | undefined, size: number): Size {

@@ -124,7 +124,7 @@ export class Metrics {
 		const index = this.diagram.messages.indexOf(edge);
 		let textHeight = 0;
 		if (edge.label) {
-			textHeight = this.textSize(edge.label, edge.fontFamily, edge.fontSize).height;
+			textHeight = this.textSize(edge).height;
 		}
 
 		if (edge.isSelfReferenced()) {
@@ -165,7 +165,7 @@ export class Metrics {
 		const left = indices[0];
 		const right = indices.splice(-1)[0];
 
-		const text = this.textSize(group.label, group.fontFamily, group.fontSize);
+		const text = this.textSize(group);
 		const x1 = this.widths.slice(0, left * 2 + 1).reduce((a, b) => a + b, 0) - 8;
 		const x2 = this.widths.slice(0, (right + 1) * 2).reduce((a, b) => a + b, 0) + 8;
 		const y1 = this.heights[0] - 8 - text.height;
@@ -179,7 +179,7 @@ export class Metrics {
 			if (!edge.label) {
 				return 0;
 			} else {
-				return metrics.textSize(edge.label, edge.fontFamily, edge.fontSize).height;
+				return metrics.textSize(edge).height;
 			}
 		};
 
@@ -217,13 +217,13 @@ export class Metrics {
 		const index = this.diagram.messages.indexOf(separator);
 		const x = this.diagram.spanWidth / 2;
 		const y = this.heights.slice(0, index * 2 + 3).reduce((a, b) => a + b, 0);
-		const text = this.textSize(separator.label, separator.fontFamily, separator.fontSize);
+		const text = this.textSize(separator);
 		const width = this.size().width - this.diagram.spanWidth;
 
 		return new Box(x, y, width, text.height + 8);
 	}
 
-	textSize(s: string, family: string | undefined, size: number): Size {
-		return this.renderer.textSize(s, family, size);
+	textSize({ label, fontFamily, fontSize }: { label: string; fontFamily?: string; fontSize: number }): Size {
+		return this.renderer.textSize({ label, fontFamily, fontSize });
 	}
 }

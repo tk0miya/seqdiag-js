@@ -1,6 +1,9 @@
 import { Diagram, Node, Edge, ActivationBar, Group, Message, Separator } from "./builder";
 import { DiagramRenderer } from "./renderer";
 
+export const Margin = 2;
+const activationBarWidth = 8;
+
 export class Size {
 	height: number;
 	width: number;
@@ -132,7 +135,7 @@ export class Metrics {
 
 			const node = this.node(edge.from);
 			const x = node.center().x;
-			const dx = this.diagram.activationDepths[edge.from.id][index] * 4;
+			const dx = this.diagram.activationDepths[edge.from.id][index] * (activationBarWidth / 2);
 			const y = this.heights.slice(0, index * 2 + 3).reduce((a, b) => a + b, 0);
 			const width = node.width / 2 + this.widths[i * 2] / 2;
 			const height = this.diagram.nodeHeight;
@@ -148,12 +151,12 @@ export class Metrics {
 			const depth2 = this.diagram.activationDepths[nodes[1].id][index];
 
 			const x1 = boxes[0].center().x;
-			const dx1 = depth1 * 4;
+			const dx1 = depth1 * (activationBarWidth / 2);
 			const x2 = boxes[1].center().x;
-			const dx2 = depth2 ? (depth2 - 2) * 4 : 0;
+			const dx2 = depth2 ? (depth2 - 2) * (activationBarWidth / 2) : 0;
 			const y = this.heights.slice(0, index * 2 + 3).reduce((a, b) => a + b, 0);
 			const width = edge.failed ? (x2 - x1) / 2 - dx1 * 2 : x2 - x1 - dx1 + dx2;
-			const height = edge.diagonal ? (this.diagram.nodeHeight * 3) / 4 : 0;
+			const height = edge.diagonal ? (this.diagram.nodeHeight * 3) / (activationBarWidth / 2) : 0;
 
 			return new Box(x1 + dx1, y, width, height + textHeight);
 		}
@@ -188,7 +191,7 @@ export class Metrics {
 		const node = this.node(bar.node);
 		const from = this.message(bar.from);
 		const to = this.message(bar.to);
-		const x = node.center().x + (bar.depth - 1) * 4 - 4;
+		const x = node.center().x + (bar.depth - 2) * (activationBarWidth / 2);
 
 		let y1;
 		if (bar.from instanceof Edge) {
@@ -222,7 +225,7 @@ export class Metrics {
 		const text = this.textSize(separator.label, this.diagram.defaultFontFamily, this.diagram.defaultFontSize);
 		const width = this.size().width - this.diagram.spanWidth;
 
-		return new Box(x, y, width, text.height + 8);
+		return new Box(x, y, width, text.height + Margin * 2);
 	}
 
 	textSize(s: string, family: string | undefined, size: number): Size {

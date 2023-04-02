@@ -1,5 +1,5 @@
 import { Diagram, Edge, Node, ActivationBar, Group, Separator } from "./builder";
-import { Metrics, Size } from "./metrics";
+import { Margin, Metrics, Size } from "./metrics";
 import "@svgdotjs/svg.filter.js/src/svg.filter.js";
 import { Element as SVGElement, Marker, SVG, Svg } from "@svgdotjs/svg.js";
 
@@ -91,9 +91,9 @@ export class DiagramRenderer {
 				.stroke(edge.textColor)
 				.font({ family: edge.fontFamily, size: edge.fontSize });
 			if (edge.arrowDirection() === "right" || edge.arrowDirection() === "self") {
-				text.move(box.left() + 4, top);
+				text.move(box.left() + Margin * 2, top);
 			} else {
-				text.move(box.right() - textSize.width - 4, top);
+				text.move(box.right() - textSize.width - Margin * 2, top);
 			}
 			top += textSize.height;
 		}
@@ -149,7 +149,7 @@ export class DiagramRenderer {
 		if (group.label) {
 			const text = this.textSize(group.label, this.diagram.defaultFontFamily, this.diagram.defaultFontSize);
 			const x = box.center().x - text.width / 2;
-			const y = box.top() + 4;
+			const y = box.top() + Margin * 2;
 			this.drawer
 				.text(group.label)
 				.stroke(this.diagram.defaultTextColor)
@@ -199,7 +199,7 @@ export class DiagramRenderer {
 		const box = this.metrics.separator(separator);
 		const text = this.textSize(separator.label, this.diagram.defaultFontFamily, this.diagram.defaultFontSize);
 		const textBox = text.move(box.center().x - text.width / 2, box.center().y - text.height / 2);
-		const frameBox = textBox.extend({ top: 2, left: 2, right: 2, bottom: 2 });
+		const frameBox = textBox.extend({ top: Margin, left: Margin, right: Margin, bottom: Margin });
 
 		const frame = this.drawer.rect(frameBox.width, frameBox.height).move(frameBox.left(), frameBox.top());
 		if (separator.type === "divider") {

@@ -279,12 +279,17 @@ export class Group extends Configurable {
 }
 
 export class Separator {
+	fontFamily?: string;
+	fontSize: number;
 	label: string;
 	type: "delayed" | "divider";
 
-	constructor(label: string, op: string) {
+	constructor(diagram: Diagram, label: string, op: string) {
 		this.label = label;
 		this.type = op === "===" ? "divider" : "delayed";
+
+		this.fontFamily = diagram.defaultFontFamily;
+		this.fontSize = diagram.defaultFontSize;
 	}
 }
 
@@ -454,7 +459,7 @@ class DiagramBuilder {
 	}
 
 	private buildSeparator(stmt: parser.separator_stmt) {
-		const separator = new Separator(stmt.label, stmt.type);
+		const separator = new Separator(this.diagram, stmt.label, stmt.type);
 		this.diagram.messages.push(separator);
 	}
 

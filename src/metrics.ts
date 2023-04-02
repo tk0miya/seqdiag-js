@@ -178,10 +178,8 @@ export class Metrics {
 		const textHeight = function (metrics: Metrics, edge: Message): number {
 			if (!edge.label) {
 				return 0;
-			} else if (edge instanceof Edge) {
-				return metrics.textSize(edge.label, edge.fontFamily, edge.fontSize).height;
 			} else {
-				return metrics.textSize(edge.label, metrics.diagram.defaultFontFamily, metrics.diagram.defaultFontSize).height;
+				return metrics.textSize(edge.label, edge.fontFamily, edge.fontSize).height;
 			}
 		};
 
@@ -219,7 +217,7 @@ export class Metrics {
 		const index = this.diagram.messages.indexOf(separator);
 		const x = this.diagram.spanWidth / 2;
 		const y = this.heights.slice(0, index * 2 + 3).reduce((a, b) => a + b, 0);
-		const text = this.textSize(separator.label, this.diagram.defaultFontFamily, this.diagram.defaultFontSize);
+		const text = this.textSize(separator.label, separator.fontFamily, separator.fontSize);
 		const width = this.size().width - this.diagram.spanWidth;
 
 		return new Box(x, y, width, text.height + 8);

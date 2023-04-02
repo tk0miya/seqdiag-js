@@ -197,7 +197,7 @@ export class DiagramRenderer {
 
 	private renderSeparator(separator: Separator) {
 		const box = this.metrics.separator(separator);
-		const text = this.textSize(separator.label, this.diagram.defaultFontFamily, this.diagram.defaultFontSize);
+		const text = this.textSize(separator.label, separator.fontFamily, separator.fontSize);
 		const textBox = text.move(box.center().x - text.width / 2, box.center().y - text.height / 2);
 		const frameBox = textBox.extend({ top: 2, left: 2, right: 2, bottom: 2 });
 

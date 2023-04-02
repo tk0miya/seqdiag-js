@@ -179,11 +179,10 @@ export class Metrics {
 
 	activationBar(bar: ActivationBar): Box {
 		const node = this.node(bar.node);
-		const from = this.message(bar.from);
-		const to = this.message(bar.to);
 		const x = node.center().x + (bar.depth - 2) * (activationBarWidth / 2);
 
 		let y1;
+		const from = this.message(bar.from);
 		if (bar.from instanceof Edge) {
 			y1 = bar.from.diagonal ? from.bottom() : from.top() + this.textSize(bar.from).height;
 		} else {
@@ -191,13 +190,19 @@ export class Metrics {
 		}
 
 		let y2;
-		if (bar.to instanceof Edge) {
-			y2 = bar.to.diagonal ? to.top() + this.textSize(bar.to).height : to.bottom();
+		if (bar.to === undefined) {
+			// unterminated activationBar will end the bottom of the diagram
+			y2 = this.heights.slice(0, this.heights.length - 1).reduce((a, b) => a + b, 0);
 		} else {
-			y2 = to.bottom();
+			const to = this.message(bar.to);
+			if (bar.to instanceof Edge) {
+				y2 = bar.to.diagonal ? to.top() + this.textSize(bar.to).height : to.bottom();
+			} else {
+				y2 = to.bottom();
+			}
 		}
 
-		return new Box(x, y1, 8, y2 - y1 + this.diagram.spanHeight);
+		return new Box(x, y1, 8, y2 - y1);
 	}
 
 	message(message: Message): Box {

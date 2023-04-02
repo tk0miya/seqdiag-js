@@ -257,7 +257,10 @@ export class ActivationBar {
 
 export class Group extends Configurable {
 	nodes: Node[];
+
 	color = "orange";
+	fontFamily?: string;
+	fontSize: number;
 	label = "";
 	shape: "box" | "line" = "box";
 	style: "solid" | "dashed" = "solid";
@@ -271,10 +274,12 @@ export class Group extends Configurable {
 		label: "label",
 	};
 
-	constructor() {
+	constructor(diagram: Diagram) {
 		super();
-
 		this.nodes = [];
+
+		this.fontFamily = diagram.defaultFontFamily;
+		this.fontSize = diagram.defaultFontSize;
 	}
 }
 
@@ -437,7 +442,7 @@ class DiagramBuilder {
 	}
 
 	private buildGroup(stmt: parser.group_stmt) {
-		const group = new Group();
+		const group = new Group(this.diagram);
 
 		stmt.statements.forEach((sub_stmt) => {
 			switch (sub_stmt.kind) {

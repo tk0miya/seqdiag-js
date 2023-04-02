@@ -147,7 +147,7 @@ export class DiagramRenderer {
 		}
 
 		if (group.label) {
-			const text = this.textSize(group.label, this.diagram.defaultFontFamily, this.diagram.defaultFontSize);
+			const text = this.textSize(group.label, group.fontFamily, group.fontSize);
 			const x = box.center().x - text.width / 2;
 			const y = box.top() + 4;
 			this.drawer

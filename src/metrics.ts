@@ -175,14 +175,6 @@ export class Metrics {
 	}
 
 	activationBar(bar: ActivationBar): Box {
-		const textHeight = function (metrics: Metrics, edge: Message): number {
-			if (!edge.label) {
-				return 0;
-			} else {
-				return metrics.textSize(edge).height;
-			}
-		};
-
 		const node = this.node(bar.node);
 		const from = this.message(bar.from);
 		const to = this.message(bar.to);
@@ -190,14 +182,14 @@ export class Metrics {
 
 		let y1;
 		if (bar.from instanceof Edge) {
-			y1 = bar.from.diagonal ? from.bottom() : from.top() + textHeight(this, bar.from);
+			y1 = bar.from.diagonal ? from.bottom() : from.top() + this.textSize(bar.from).height;
 		} else {
 			y1 = from.top();
 		}
 
 		let y2;
 		if (bar.to instanceof Edge) {
-			y2 = bar.to.diagonal ? to.top() + textHeight(this, bar.to) : to.bottom();
+			y2 = bar.to.diagonal ? to.top() + this.textSize(bar.to).height : to.bottom();
 		} else {
 			y2 = to.bottom();
 		}

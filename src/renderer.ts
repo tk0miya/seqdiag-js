@@ -1,4 +1,4 @@
-import { Diagram, Edge, Node, ActivationBar, Group } from "./builder";
+import { Diagram, Edge, Node, ActivationBar, Group, Separator } from "./builder";
 import { Metrics, Size } from "./metrics";
 import "@svgdotjs/svg.filter.js/src/svg.filter.js";
 import { Element as SVGElement, Marker, SVG, Svg } from "@svgdotjs/svg.js";
@@ -38,8 +38,12 @@ export class DiagramRenderer {
 			this.renderActivationBar(bar);
 		});
 
-		this.diagram.edges.forEach((edge) => {
-			this.renderEdge(edge);
+		this.diagram.messages.forEach((msg) => {
+			if (msg instanceof Edge) {
+				this.renderEdge(msg);
+			} else {
+				this.renderSeparator(msg);
+			}
 		});
 
 		this.element.id ||= generateElementId();
@@ -189,6 +193,34 @@ export class DiagramRenderer {
 			.stroke(this.diagram.defaultLineColor)
 			.move(box.left(), box.top());
 		this.dropShadow(rect);
+	}
+
+	private renderSeparator(separator: Separator) {
+		const box = this.metrics.separator(separator);
+		const text = this.textSize(separator.label, this.diagram.defaultFontFamily, this.diagram.defaultFontSize);
+		const textBox = text.move(box.center().x - text.width / 2, box.center().y - text.height / 2);
+		const frameBox = textBox.extend({ top: 2, left: 2, right: 2, bottom: 2 });
+
+		const frame = this.drawer.rect(frameBox.width, frameBox.height).move(frameBox.left(), frameBox.top());
+		if (separator.type === "divider") {
+			frame.fill("lightgray").stroke(this.diagram.defaultLineColor);
+		} else {
+			frame.fill("white");
+		}
+
+		this.drawer
+			.text(separator.label)
+			.stroke(this.diagram.defaultTextColor)
+			.font({ family: this.diagram.defaultFontFamily, size: this.diagram.defaultFontSize })
+			.move(textBox.left(), textBox.top());
+
+		if (separator.type === "divider") {
+			const baseline = box.center().y;
+			this.drawer.line(box.left(), baseline - 2, frameBox.left(), baseline - 2).stroke(this.diagram.defaultLineColor);
+			this.drawer.line(box.left(), baseline + 2, frameBox.left(), baseline + 2).stroke(this.diagram.defaultLineColor);
+			this.drawer.line(frameBox.right(), baseline - 2, box.right(), baseline - 2).stroke(this.diagram.defaultLineColor);
+			this.drawer.line(frameBox.right(), baseline + 2, box.right(), baseline + 2).stroke(this.diagram.defaultLineColor);
+		}
 	}
 
 	textSize(s: string, family: string | undefined, size: number): Size {

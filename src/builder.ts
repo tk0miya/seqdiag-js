@@ -257,7 +257,10 @@ export class ActivationBar {
 
 export class Group extends Configurable {
 	nodes: Node[];
+
 	color = "orange";
+	fontFamily?: string;
+	fontSize: number;
 	label = "";
 	shape: "box" | "line" = "box";
 	style: "solid" | "dashed" = "solid";
@@ -271,20 +274,27 @@ export class Group extends Configurable {
 		label: "label",
 	};
 
-	constructor() {
+	constructor(diagram: Diagram) {
 		super();
-
 		this.nodes = [];
+
+		this.fontFamily = diagram.defaultFontFamily;
+		this.fontSize = diagram.defaultFontSize;
 	}
 }
 
 export class Separator {
+	fontFamily?: string;
+	fontSize: number;
 	label: string;
 	type: "delayed" | "divider";
 
-	constructor(label: string, op: string) {
+	constructor(diagram: Diagram, label: string, op: string) {
 		this.label = label;
 		this.type = op === "===" ? "divider" : "delayed";
+
+		this.fontFamily = diagram.defaultFontFamily;
+		this.fontSize = diagram.defaultFontSize;
 	}
 }
 
@@ -432,7 +442,7 @@ class DiagramBuilder {
 	}
 
 	private buildGroup(stmt: parser.group_stmt) {
-		const group = new Group();
+		const group = new Group(this.diagram);
 
 		stmt.statements.forEach((sub_stmt) => {
 			switch (sub_stmt.kind) {
@@ -454,7 +464,7 @@ class DiagramBuilder {
 	}
 
 	private buildSeparator(stmt: parser.separator_stmt) {
-		const separator = new Separator(stmt.label, stmt.type);
+		const separator = new Separator(this.diagram, stmt.label, stmt.type);
 		this.diagram.messages.push(separator);
 	}
 

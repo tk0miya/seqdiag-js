@@ -85,7 +85,7 @@ export class DiagramRenderer {
 		const box = this.metrics.edge(edge);
 		let top = box.top();
 		if (edge.label) {
-			const textSize = this.textSize(edge.label, edge.fontFamily, edge.fontSize);
+			const textSize = this.textSize(edge);
 			const text = this.drawer
 				.text(edge.label)
 				.stroke(edge.textColor)
@@ -147,7 +147,7 @@ export class DiagramRenderer {
 		}
 
 		if (group.label) {
-			const text = this.textSize(group.label, this.diagram.defaultFontFamily, this.diagram.defaultFontSize);
+			const text = this.textSize(group);
 			const x = box.center().x - text.width / 2;
 			const y = box.top() + Margin * 2;
 			this.drawer
@@ -175,7 +175,7 @@ export class DiagramRenderer {
 
 		this.dropShadow(rect);
 
-		const text = this.textSize(node.label, node.fontFamily, node.fontSize);
+		const text = this.textSize(node);
 		const x = box.left() + box.width / 2 - text.width / 2;
 		const y = box.top() + box.height / 2 - text.height / 2;
 		this.drawer
@@ -197,7 +197,7 @@ export class DiagramRenderer {
 
 	private renderSeparator(separator: Separator) {
 		const box = this.metrics.separator(separator);
-		const text = this.textSize(separator.label, this.diagram.defaultFontFamily, this.diagram.defaultFontSize);
+		const text = this.textSize(separator);
 		const textBox = text.move(box.center().x - text.width / 2, box.center().y - text.height / 2);
 		const frameBox = textBox.extend({ top: Margin, left: Margin, right: Margin, bottom: Margin });
 
@@ -223,8 +223,8 @@ export class DiagramRenderer {
 		}
 	}
 
-	textSize(s: string, family: string | undefined, size: number): Size {
-		const text = this.drawer.text(s).font({ family, size });
+	textSize({ label, fontFamily, fontSize }: { label: string; fontFamily?: string; fontSize: number }): Size {
+		const text = this.drawer.text(label).font({ family: fontFamily, size: fontSize });
 		const bbox = text.bbox();
 		text.remove();
 		return new Size(bbox.width, bbox.height);

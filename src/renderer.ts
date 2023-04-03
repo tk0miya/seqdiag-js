@@ -41,6 +41,7 @@ export class DiagramRenderer {
 		this.diagram.messages.forEach((msg) => {
 			if (msg instanceof Edge) {
 				this.renderEdge(msg);
+				this.renderEdgeLeftNote(msg);
 				this.renderEdgeRightNote(msg);
 			} else {
 				this.renderSeparator(msg);
@@ -134,6 +135,18 @@ export class DiagramRenderer {
 			const y = box.bottom();
 			this.drawer.line(x - 8, y - 8, x + 8, y + 8).stroke(edge.color);
 			this.drawer.line(x - 8, y + 8, x + 8, y - 8).stroke(edge.color);
+		}
+	}
+
+	private renderEdgeLeftNote(edge: Edge) {
+		if (edge.leftNote) {
+			const box = this.metrics.edgeLeftNote(edge);
+			this.note(box).fill("pink").stroke("black").move(box.left(), box.top());
+			this.drawer
+				.text(edge.leftNote)
+				.stroke(edge.textColor)
+				.font({ family: edge.fontFamily, size: edge.fontSize })
+				.move(box.left() + Margin, box.top() + Margin);
 		}
 	}
 

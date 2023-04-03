@@ -99,6 +99,22 @@ export class Metrics {
 		});
 		this.heights.push(this.diagram.spanHeight);
 		this.heights.push(this.diagram.spanHeight);
+
+		this.adjustMetricsForEdgeNote();
+	}
+
+	adjustMetricsForEdgeNote() {
+		const pageSize = this.size();
+		this.diagram.messages.forEach((msg) => {
+			if (msg instanceof Edge) {
+				if (msg.rightNote) {
+					const box = this.edgeRightNote(msg);
+					if (pageSize.width < box.right() + Margin * 2) {
+						this.widths[this.widths.length - 1] += box.right() + Margin * 2 - pageSize.width;
+					}
+				}
+			}
+		});
 	}
 
 	size(): Size {

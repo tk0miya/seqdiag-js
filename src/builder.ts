@@ -244,10 +244,10 @@ export class Edge extends Configurable {
 export class ActivationBar {
 	node: Node;
 	from: Message;
-	to: Message;
+	to?: Message;
 	depth: number;
 
-	constructor(node: Node, from: Message, to: Message, depth: number) {
+	constructor(node: Node, from: Message, to: Message | undefined, depth: number) {
 		this.node = node;
 		this.from = from;
 		this.to = to;
@@ -338,7 +338,6 @@ class DiagramBuilder {
 
 	private buildActivationBars() {
 		const depths: { [key: string]: number } = {};
-		const activationBars: [Node, Message, Message | undefined, number][] = [];
 
 		if (this.diagram.messages.length === 0) {
 			return;
@@ -353,7 +352,7 @@ class DiagramBuilder {
 			this.diagram.activationDepths[node.id] = [];
 			depths[node.id] = node.activated ? 1 : 0;
 			if (node.activated) {
-				activationBars.push([node, this.diagram.messages[0], undefined, 1]);
+				this.diagram.activationBars.push(new ActivationBar(node, this.diagram.messages[0], undefined, 1));
 			}
 		});
 
@@ -366,7 +365,7 @@ class DiagramBuilder {
 			} else {
 				if (msg.direction === "forward") {
 					const depth = (depths[msg.to.id] || 0) + 1;
-					activationBars.push([msg.to, msg, undefined, depth]);
+					this.diagram.activationBars.push(new ActivationBar(msg.to, msg, undefined, depth));
 					depths[msg.to.id] = depth;
 				}
 
@@ -375,19 +374,15 @@ class DiagramBuilder {
 				});
 
 				if (msg.direction === "back") {
-					const activationBar = activationBars.findLast((bar) => bar[0] === msg.to && bar[2] === undefined);
+					const activationBar = this.diagram.activationBars.findLast((bar) => {
+						return bar.node === msg.to && bar.to === undefined;
+					});
 					if (activationBar) {
-						activationBar[2] = msg;
+						activationBar.to = msg;
 						depths[msg.to.id] -= 1;
 					}
 				}
 			}
-		});
-
-		activationBars.forEach((bar) => {
-			const [node, from, to, depth] = bar;
-			const to_message = to || this.diagram.messages.slice(-1)[0];
-			this.diagram.activationBars.push(new ActivationBar(node, from, to_message, depth));
 		});
 	}
 

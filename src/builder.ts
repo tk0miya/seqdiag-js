@@ -90,6 +90,7 @@ export class Diagram extends Configurable {
 	defaultFontSize = 11;
 	defaultLineColor = "black";
 	defaultNodeColor = "white";
+	defaultNoteColor = "lightpink";
 	defaultTextColor = "black";
 	nodeHeight = 40;
 	nodeWidth = 120;
@@ -110,6 +111,7 @@ export class Diagram extends Configurable {
 		default_fontfamily: "defaultFontFamily",
 		default_linecolor: "defaultLineColor",
 		default_node_color: "defaultNodeColor",
+		default_note_color: "defaultNoteColor",
 		default_textcolor: "defaultTextColor",
 	};
 
@@ -183,6 +185,7 @@ export class Edge extends Configurable {
 	fontSize: number;
 	label = "";
 	leftNote = "";
+	noteColor: string;
 	rightNote = "";
 	return = "";
 	style: "solid" | "dashed";
@@ -202,6 +205,8 @@ export class Edge extends Configurable {
 		label: "label",
 		leftnote: "leftNote",
 		note: "rightNote",
+		notecolor: "noteColor",
+		note_color: "noteColor",
 		return: "return",
 		rightnote: "rightNote",
 		textcolor: "textColor",
@@ -219,6 +224,7 @@ export class Edge extends Configurable {
 		this.direction = op.endsWith(">") ? "forward" : "back";
 		this.fontFamily = diagram.defaultFontFamily;
 		this.fontSize = diagram.defaultFontSize;
+		this.noteColor = diagram.defaultNoteColor;
 		this.style = op.includes("--") ? "dashed" : "solid";
 		this.textColor = diagram.defaultTextColor;
 	}

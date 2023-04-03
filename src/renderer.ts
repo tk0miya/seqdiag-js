@@ -141,7 +141,7 @@ export class DiagramRenderer {
 	private renderEdgeLeftNote(edge: Edge) {
 		if (edge.leftNote) {
 			const box = this.metrics.edgeLeftNote(edge);
-			this.note(box).fill("pink").stroke("black").move(box.left(), box.top());
+			this.note(box).fill(edge.noteColor).stroke("black").move(box.left(), box.top());
 			this.drawer
 				.text(edge.leftNote)
 				.stroke(edge.textColor)
@@ -153,7 +153,7 @@ export class DiagramRenderer {
 	private renderEdgeRightNote(edge: Edge) {
 		if (edge.rightNote) {
 			const box = this.metrics.edgeRightNote(edge);
-			this.note(box).fill("pink").stroke("black").move(box.left(), box.top());
+			this.note(box).fill(edge.noteColor).stroke("black").move(box.left(), box.top());
 			this.drawer
 				.text(edge.rightNote)
 				.stroke(edge.textColor)

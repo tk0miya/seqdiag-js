@@ -88,6 +88,7 @@ export class Diagram extends Configurable {
 
 	defaultFontFamily?: string;
 	defaultFontSize = 11;
+	defaultGroupColor = "orange";
 	defaultLineColor = "black";
 	defaultNodeColor = "white";
 	defaultTextColor = "black";
@@ -108,6 +109,7 @@ export class Diagram extends Configurable {
 	};
 	stringFields: { [key: string]: keyof Diagram } = {
 		default_fontfamily: "defaultFontFamily",
+		default_group_color: "defaultGroupColor",
 		default_linecolor: "defaultLineColor",
 		default_node_color: "defaultNodeColor",
 		default_textcolor: "defaultTextColor",
@@ -263,7 +265,7 @@ export class ActivationBar {
 export class Group extends Configurable {
 	nodes: Node[];
 
-	color = "orange";
+	color: string;
 	fontFamily?: string;
 	fontSize: number;
 	label = "";
@@ -285,6 +287,7 @@ export class Group extends Configurable {
 
 		this.fontFamily = diagram.defaultFontFamily;
 		this.fontSize = diagram.defaultFontSize;
+		this.color = diagram.defaultGroupColor;
 	}
 }
 

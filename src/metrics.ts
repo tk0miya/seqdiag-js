@@ -107,6 +107,13 @@ export class Metrics {
 		const pageSize = this.size();
 		this.diagram.messages.forEach((msg) => {
 			if (msg instanceof Edge) {
+				if (msg.leftNote) {
+					const box = this.edgeLeftNote(msg);
+					if (box.left() - Margin * 2 < 0) {
+						this.widths[0] += -box.left() + Margin * 2;
+					}
+				}
+
 				if (msg.rightNote) {
 					const box = this.edgeRightNote(msg);
 					if (pageSize.width < box.right() + Margin * 2) {
@@ -176,6 +183,21 @@ export class Metrics {
 
 			return new Box(x1 + dx1, y, width, height + textHeight);
 		}
+	}
+
+	edgeLeftNote(edge: Edge): Box {
+		const index = this.diagram.messages.indexOf(edge);
+		const nodes = [edge.from, edge.to];
+		nodes.sort((a, b) => this.diagram.nodes.indexOf(a) - this.diagram.nodes.indexOf(b));
+		const depth = this.diagram.activationDepths[nodes[0].id][index];
+
+		const box = this.edge(edge);
+		const text = this.textSize({ label: edge.leftNote, fontFamily: edge.fontFamily, fontSize: edge.fontSize });
+		const x = box.left() - Margin * 2;
+		const dx = depth ? (depth + 1) * (activationBarWidth / 2) : 0;
+		const width = text.width + 8 + Margin * 2;
+
+		return new Box(x - dx - width, box.top(), width, text.height + Margin * 2);
 	}
 
 	edgeRightNote(edge: Edge): Box {

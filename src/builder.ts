@@ -182,6 +182,7 @@ export class Edge extends Configurable {
 	fontFamily?: string;
 	fontSize: number;
 	label = "";
+	rightNote = "";
 	return = "";
 	style: "solid" | "dashed";
 	textColor: string;
@@ -198,7 +199,9 @@ export class Edge extends Configurable {
 		color: "color",
 		fontfamily: "fontFamily",
 		label: "label",
+		note: "rightNote",
 		return: "return",
+		rightnote: "rightNote",
 		textcolor: "textColor",
 	};
 

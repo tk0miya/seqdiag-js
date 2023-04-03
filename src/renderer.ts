@@ -1,5 +1,5 @@
 import { Diagram, Edge, Node, ActivationBar, Group, Separator } from "./builder";
-import { Margin, Metrics, Size } from "./metrics";
+import { Box, Margin, Metrics, Size } from "./metrics";
 import "@svgdotjs/svg.filter.js/src/svg.filter.js";
 import { Element as SVGElement, Marker, SVG, Svg } from "@svgdotjs/svg.js";
 
@@ -41,6 +41,7 @@ export class DiagramRenderer {
 		this.diagram.messages.forEach((msg) => {
 			if (msg instanceof Edge) {
 				this.renderEdge(msg);
+				this.renderEdgeRightNote(msg);
 			} else {
 				this.renderSeparator(msg);
 			}
@@ -63,6 +64,12 @@ export class DiagramRenderer {
 			const blur = add.offset(2, 2).in(add.$sourceAlpha).gaussianBlur(2);
 			add.blend(add.$source, blur);
 		});
+	}
+
+	private note(box: Box): SVGElement {
+		const { width, height } = box;
+		const points = [width - 8, 0, width - 8, 8, width, 8, width - 8, 0, 0, 0, 0, height, width, height, width, 8];
+		return this.drawer.polyline(points);
 	}
 
 	private renderArrowheads(asynchronous: boolean, color: string): Marker {
@@ -127,6 +134,18 @@ export class DiagramRenderer {
 			const y = box.bottom();
 			this.drawer.line(x - 8, y - 8, x + 8, y + 8).stroke(edge.color);
 			this.drawer.line(x - 8, y + 8, x + 8, y - 8).stroke(edge.color);
+		}
+	}
+
+	private renderEdgeRightNote(edge: Edge) {
+		if (edge.rightNote) {
+			const box = this.metrics.edgeRightNote(edge);
+			this.note(box).fill("pink").stroke("black").move(box.left(), box.top());
+			this.drawer
+				.text(edge.rightNote)
+				.stroke(edge.textColor)
+				.font({ family: edge.fontFamily, size: edge.fontSize })
+				.move(box.left() + Margin, box.top() + Margin);
 		}
 	}
 

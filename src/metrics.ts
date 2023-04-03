@@ -99,6 +99,22 @@ export class Metrics {
 		});
 		this.heights.push(this.diagram.spanHeight);
 		this.heights.push(this.diagram.spanHeight);
+
+		this.adjustMetricsForEdgeNote();
+	}
+
+	adjustMetricsForEdgeNote() {
+		const pageSize = this.size();
+		this.diagram.messages.forEach((msg) => {
+			if (msg instanceof Edge) {
+				if (msg.rightNote) {
+					const box = this.edgeRightNote(msg);
+					if (pageSize.width < box.right() + Margin * 2) {
+						this.widths[this.widths.length - 1] += box.right() + Margin * 2 - pageSize.width;
+					}
+				}
+			}
+		});
 	}
 
 	size(): Size {
@@ -160,6 +176,20 @@ export class Metrics {
 
 			return new Box(x1 + dx1, y, width, height + textHeight);
 		}
+	}
+
+	edgeRightNote(edge: Edge): Box {
+		const index = this.diagram.messages.indexOf(edge);
+		const nodes = [edge.from, edge.to];
+		nodes.sort((a, b) => this.diagram.nodes.indexOf(a) - this.diagram.nodes.indexOf(b));
+		const depth = this.diagram.activationDepths[nodes[1].id][index];
+
+		const box = this.edge(edge);
+		const text = this.textSize({ label: edge.rightNote, fontFamily: edge.fontFamily, fontSize: edge.fontSize });
+		const x = box.right() + Margin * 2;
+		const dx = depth ? (depth + 1) * (activationBarWidth / 2) : 0;
+
+		return new Box(x + dx, box.top(), text.width + 8 + Margin * 2, text.height + Margin * 2);
 	}
 
 	group(group: Group): Box {

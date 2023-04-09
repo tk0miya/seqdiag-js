@@ -1,3 +1,6 @@
+---
+import { parseLiteralString } from "./parser/utils";
+---
 diagram := SP* prefix=diagram_prefix? SP* '{' SP* _statements=statements SP* '}' SP* $
         .id = identifier | undefined { return this.prefix?.diagram_id }
         .statements = statement[] { return this._statements.statements }
@@ -101,14 +104,14 @@ option_stmt := name=identifier rvalue={ SP* '=' SP* value=value }?
                }
 
 SP := '[ \t\r\n]' | SingleLineComment | MultiLineComment
-String := literal='"""(.|\r\n)*?"""'
-          .value = string { return this.literal.slice(3, -3).trim() }
-       |  literal='\'\'\'(.|[\r\n])*?\'\'\''
-          .value = string { return this.literal.slice(3, -3).trim() }
+String := literal='"""(.|\r?\n)*?"""'
+          .value = string { return parseLiteralString(this.literal) }
+       |  literal='\'\'\'(.|[\r?\n])*?\'\'\''
+          .value = string { return parseLiteralString(this.literal) }
        |  literal='"(\\.|[^\"])*"'
-          .value = string { return this.literal.slice(1, -1) }
+          .value = string { return parseLiteralString(this.literal) }
        |  literal='\'(\\.|[^\\\'])*\''
-          .value = string { return this.literal.slice(1, -1) }
+          .value = string { return parseLiteralString(this.literal) }
 Number := literal='-?(\.[0-9]+)|([0-9]+(\.[0-9]*)?)'
           .value = number { return parseInt(this.literal) }
 identifier := '[A-Za-z_0-9\u0080-\uFFFF][A-Za-z_\-.0-9\u0080-\uFFFF]*'

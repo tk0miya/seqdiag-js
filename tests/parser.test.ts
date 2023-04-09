@@ -272,4 +272,33 @@ describe("grammar.pegjs", () => {
 			expect(node.options.length).toBe(0);
 		});
 	});
+
+	describe("given a multiline string", () => {
+		it("can parse a multiline string", () => {
+			const ast = parse(`seqdiag { default_node_color = """
+								 orange
+							     and
+								 pink
+							     """
+							   }`);
+			assert(ast.ast !== null);
+			expect(ast.ast.statements.length).toBe(1);
+			assert(ast.ast.statements[0].kind === ASTKinds.attribute_stmt);
+
+			const attribute: attribute_stmt = ast.ast.statements[0];
+			expect(attribute.name).toBe("default_node_color");
+			expect(attribute.value).toBe("orange\nand\npink");
+		});
+
+		it("can parse a string contains '\n'", () => {
+			const ast = parse(`seqdiag { default_line_color = "orange\nand\npink" }`);
+			assert(ast.ast !== null);
+			expect(ast.ast.statements.length).toBe(1);
+			assert(ast.ast.statements[0].kind === ASTKinds.attribute_stmt);
+
+			const attribute: attribute_stmt = ast.ast.statements[0];
+			expect(attribute.name).toBe("default_line_color");
+			expect(attribute.value).toBe("orange\nand\npink");
+		});
+	});
 });

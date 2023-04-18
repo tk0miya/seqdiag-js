@@ -22,6 +22,9 @@ export class DiagramRenderer {
 	}
 
 	render() {
+		this.element.id ||= generateElementId();
+		this.drawer.addTo(`#${this.element.id}`);
+
 		const size = this.metrics.size();
 		this.drawer.size(size.width, size.height);
 
@@ -47,9 +50,6 @@ export class DiagramRenderer {
 				this.renderSeparator(msg);
 			}
 		});
-
-		this.element.id ||= generateElementId();
-		this.drawer.addTo(`#${this.element.id}`);
 	}
 
 	private blur(e: SVGElement) {
@@ -94,10 +94,7 @@ export class DiagramRenderer {
 		let top = box.top();
 		if (edge.label) {
 			const textSize = this.textSize(edge);
-			const text = this.drawer
-				.text(edge.label)
-				.stroke(edge.textColor)
-				.font({ family: edge.fontFamily, size: edge.fontSize });
+			const text = this.text(edge.label, { family: edge.fontFamily, size: edge.fontSize }).stroke(edge.textColor);
 			if (edge.arrowDirection() === "right" || edge.arrowDirection() === "self") {
 				text.move(box.left() + Margin * 2, top);
 			} else {
@@ -142,10 +139,8 @@ export class DiagramRenderer {
 		if (edge.leftNote) {
 			const box = this.metrics.edgeLeftNote(edge);
 			this.note(box).fill(edge.noteColor).stroke("black").move(box.left(), box.top());
-			this.drawer
-				.text(edge.leftNote)
+			this.text(edge.leftNote, { family: edge.fontFamily, size: edge.fontSize })
 				.stroke(edge.textColor)
-				.font({ family: edge.fontFamily, size: edge.fontSize })
 				.move(box.left() + Margin, box.top() + Margin);
 		}
 	}
@@ -154,10 +149,8 @@ export class DiagramRenderer {
 		if (edge.rightNote) {
 			const box = this.metrics.edgeRightNote(edge);
 			this.note(box).fill(edge.noteColor).stroke("black").move(box.left(), box.top());
-			this.drawer
-				.text(edge.rightNote)
+			this.text(edge.rightNote, { family: edge.fontFamily, size: edge.fontSize })
 				.stroke(edge.textColor)
-				.font({ family: edge.fontFamily, size: edge.fontSize })
 				.move(box.left() + Margin, box.top() + Margin);
 		}
 	}
@@ -182,10 +175,8 @@ export class DiagramRenderer {
 			const text = this.textSize(group);
 			const x = box.center().x - text.width / 2;
 			const y = box.top() + Margin * 2;
-			this.drawer
-				.text(group.label)
+			this.text(group.label, { family: this.diagram.defaultFontFamily, size: this.diagram.defaultFontSize })
 				.stroke(this.diagram.defaultTextColor)
-				.font({ family: this.diagram.defaultFontFamily, size: this.diagram.defaultFontSize })
 				.move(x, y);
 		}
 	}
@@ -210,11 +201,7 @@ export class DiagramRenderer {
 		const text = this.textSize(node);
 		const x = box.left() + box.width / 2 - text.width / 2;
 		const y = box.top() + box.height / 2 - text.height / 2;
-		this.drawer
-			.text(node.label)
-			.stroke(node.textColor)
-			.font({ family: node.fontFamily, size: node.fontSize })
-			.move(x, y);
+		this.text(node.label, { family: node.fontFamily, size: node.fontSize }).stroke(node.textColor).move(x, y);
 	}
 
 	private renderActivationBar(bar: ActivationBar) {
@@ -240,10 +227,8 @@ export class DiagramRenderer {
 			frame.fill("white");
 		}
 
-		this.drawer
-			.text(separator.label)
+		this.text(separator.label, { family: this.diagram.defaultFontFamily, size: this.diagram.defaultFontSize })
 			.stroke(this.diagram.defaultTextColor)
-			.font({ family: this.diagram.defaultFontFamily, size: this.diagram.defaultFontSize })
 			.move(textBox.left(), textBox.top());
 
 		if (separator.type === "divider") {
@@ -253,6 +238,20 @@ export class DiagramRenderer {
 			this.drawer.line(frameBox.right(), baseline - 2, box.right(), baseline - 2).stroke(this.diagram.defaultLineColor);
 			this.drawer.line(frameBox.right(), baseline + 2, box.right(), baseline + 2).stroke(this.diagram.defaultLineColor);
 		}
+	}
+
+	private text(label: string, font: { family?: string; size: number }): SVGElement {
+		const self = this;
+		const textSize = this.textSize({ label, fontFamily: font.family, fontSize: font.size });
+		const lines = label.split(/\r?\n/);
+		const text = this.drawer.text(function (add) {
+			lines.forEach((line) => {
+				const lineSize = self.textSize({ label: line, fontFamily: font.family, fontSize: font.size });
+				const dx = (textSize.width - lineSize.width) / 2;
+				add.tspan(line).dx(dx).newLine();
+			});
+		});
+		return text.font(font);
 	}
 
 	textSize({ label, fontFamily, fontSize }: { label: string; fontFamily?: string; fontSize: number }): Size {

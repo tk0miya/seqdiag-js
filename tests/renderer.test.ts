@@ -27,9 +27,8 @@ describe("DiagramRenderer", () => {
 			const renderer = new DiagramRenderer(diagram, rootElement);
 			renderer.render();
 
-			// NOTE: jsdom inserts a dummy node automatically to obtain the rendered size of the text
-			expect(rootElement.children.length).toBe(2);
-			expect(rootElement.lastElementChild?.tagName).toBe("svg");
+			expect(rootElement.children.length).toBe(1);
+			expect(rootElement.children[0].tagName).toBe("svg");
 		});
 	});
 });

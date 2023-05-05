@@ -12,8 +12,8 @@
     "prebuild": "rimraf dist",
     "build": "npm run build:parser && run-p build:dist",
     "build:parser": "tspeg src/grammar.pegjs src/parser.ts",
-    "build:dist": "esbuild src/index.ts --bundle --minify --sourcemap --outfile=dist/seqdiag.min.js",
-    "build:dist:watch": "esbuild src/index.ts --watch --bundle --minify --sourcemap --outfile=dist/seqdiag.min.js",
+    "build:dist": "esbuild src/index.ts --bundle --format=esm --minify --sourcemap --outfile=dist/seqdiag.min.js",
+    "build:dist:watch": "esbuild src/index.ts --watch --bundle --format=esm --minify --sourcemap --outfile=dist/seqdiag.min.js",
     "start": "npm-run-all -p build:dist:watch start:server",
     "start:server": "reload -b -s example/index.html",
     "test": "npm run build:parser && jest"

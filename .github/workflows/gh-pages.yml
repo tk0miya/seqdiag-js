@@ -4,7 +4,8 @@ name: Deploy to GitHub Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: [$default-branch]
+    branches:
+      - main
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -41,7 +42,7 @@ jobs:
         run: >
           mkdir docs;
           cp dist/* docs;
-          sed -e 's|../dist/||' < example/index.html > docs/index.html;
+          sed -e 's|../dist/seqdiag.min.js|./seqdiag.min.js|' < example/index.html > docs/index.html;
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
